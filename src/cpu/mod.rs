@@ -1,4 +1,5 @@
 mod load_instructions;
+mod store_instructions;
 mod arithmetic_instructions;
 mod addressing_modes;
 
@@ -56,6 +57,7 @@ impl CPU {
         loop {
             let op_code = self.mem_read(self.program_counter);
             self.program_counter += 1;
+            println!("Found opcode ${op_code}");
             match op_code {
                 0xA9 => {
                     self.load_register_a(AddressingMode::Immediate);
@@ -87,6 +89,34 @@ impl CPU {
                 }
                 0xB1 => {
                     self.load_register_a(AddressingMode::IndirectY);
+                    self.program_counter += 1;
+                },
+                0x85 => {
+                    self.store_register_a(AddressingMode::ZeroPage);
+                    self.program_counter += 1;
+                },
+                0x95 => {
+                    self.store_register_a(AddressingMode::ZeroPageX);
+                    self.program_counter += 1;
+                },
+                0x8D => {
+                    self.store_register_a(AddressingMode::Absolute);
+                    self.program_counter += 2;
+                },
+                0x9D => {
+                    self.store_register_a(AddressingMode::AbsoluteX);
+                    self.program_counter += 2;
+                },
+                0x99 => {
+                    self.store_register_a(AddressingMode::AbsoluteY);
+                    self.program_counter += 2;
+                },
+                0x81 => {
+                    self.store_register_a(AddressingMode::IndirectX);
+                    self.program_counter += 1;
+                },
+                0x91 => {
+                    self.store_register_a(AddressingMode::IndirectY);
                     self.program_counter += 1;
                 },
                 0xAA => self.transfer_a_to_x(),
@@ -142,6 +172,16 @@ mod cpu_tests {
         assert_eq!(cpu.register_a, 0x15);
         assert_eq!(cpu.register_x, 0x16);
         assert_eq!(cpu.status, 0b0000_0000);
+        assert_eq!(cpu.program_counter, 0x8005);
+    }
+
+    #[test]
+    pub fn store_instruction() {
+        let mut cpu = CPU::new();
+        cpu.mem_write_u16(0xFFFC, 0x8000);
+        cpu.load_and_run(vec!(0xA9, 0x15, 0x85, 0x15, 0x00));
+
+        assert_eq!(cpu.mem_read(0x15), 0x15);
         assert_eq!(cpu.program_counter, 0x8005);
     }
 

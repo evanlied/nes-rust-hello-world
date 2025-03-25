@@ -5,10 +5,10 @@ impl CPU {
     // LDA
     pub fn load_register_a(&mut self, mode: AddressingMode) {
         let addr = self.get_operand_address(&mode);
-        let param = &self.memory[addr as usize];
-        self.register_a = *param;
+        let param = self.mem_read(addr);
+        self.register_a = param;
 
-        self.set_status_flag(*param);
+        self.set_status_flag(param);
     }
 
     // TAX
