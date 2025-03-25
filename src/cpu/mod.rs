@@ -2,6 +2,8 @@ mod load_instructions;
 mod arithmetic_instructions;
 mod addressing_modes;
 
+use addressing_modes::AddressingMode;
+
 pub struct CPU {
     pub register_a: u8,
     pub register_x: u8,
@@ -53,15 +55,45 @@ impl CPU {
     pub fn run(&mut self) {
         loop {
             let op_code = self.mem_read(self.program_counter);
+            self.program_counter += 1;
             match op_code {
-                0xA9 => self.load_register_a(),
+                0xA9 => {
+                    self.load_register_a(AddressingMode::Immediate);
+                    self.program_counter += 1;
+                },
+                0xA5 => {
+                    self.load_register_a(AddressingMode::ZeroPage);
+                    self.program_counter += 1;
+                },
+                0xB5 => {
+                    self.load_register_a(AddressingMode::ZeroPageX);
+                    self.program_counter += 1;
+                },
+                0xAD => {
+                    self.load_register_a(AddressingMode::Absolute);
+                    self.program_counter += 2;
+                },
+                0xBD => {
+                    self.load_register_a(AddressingMode::AbsoluteX);
+                    self.program_counter += 2;
+                },
+                0xB9 => {
+                    self.load_register_a(AddressingMode::AbsoluteY);
+                    self.program_counter +=2;
+                },
+                0xA1 => {
+                    self.load_register_a(AddressingMode::IndirectX);
+                    self.program_counter += 1;
+                }
+                0xB1 => {
+                    self.load_register_a(AddressingMode::IndirectY);
+                    self.program_counter += 1;
+                },
                 0xAA => self.transfer_a_to_x(),
                 0xE8 => self.increment_x(),
                 0x00 => return,
                 _=> println!("TODO for ${op_code}"), 
             }
-
-            self.program_counter += 1;
         }
     }
 
@@ -110,7 +142,7 @@ mod cpu_tests {
         assert_eq!(cpu.register_a, 0x15);
         assert_eq!(cpu.register_x, 0x16);
         assert_eq!(cpu.status, 0b0000_0000);
-        assert_eq!(cpu.program_counter, 0x8004);
+        assert_eq!(cpu.program_counter, 0x8005);
     }
 
     #[test]

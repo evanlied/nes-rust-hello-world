@@ -1,10 +1,11 @@
 use super::CPU;
+use super::addressing_modes::AddressingMode;
 
 impl CPU {
     // LDA
-    pub fn load_register_a(&mut self) {
-        self.program_counter += 1;
-        let param = &self.memory[self.program_counter as usize];
+    pub fn load_register_a(&mut self, mode: AddressingMode) {
+        let addr = self.get_operand_address(&mode);
+        let param = &self.memory[addr as usize];
         self.register_a = *param;
 
         self.set_status_flag(*param);
