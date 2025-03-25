@@ -1,9 +1,11 @@
 mod load_instructions;
 mod arithmetic_instructions;
+mod addressing_modes;
 
 pub struct CPU {
     pub register_a: u8,
     pub register_x: u8,
+    pub register_y: u8,
     pub status: u8,
     pub program_counter: u16,
     memory: [u8; 0xFFFF],
@@ -14,6 +16,7 @@ impl CPU {
         CPU {
             register_a: 0,
             register_x: 0,
+            register_y: 0,
             status: 0,
             program_counter: 0,
             memory: [0; 0xFFFF],
@@ -34,6 +37,19 @@ impl CPU {
         self.memory[addr as usize] = data;
     }
 
+    fn mem_read_u16(&self, addr: u16) -> u16 {
+        let lo = self.mem_read(addr);
+        let hi = self.mem_read(addr + 1);
+        u16::from_le_bytes([lo, hi])
+    }
+
+    fn mem_write_u16(&mut self, addr: u16, data: u16) {
+        let lo = (data & 0x00FF) as u8;
+        let hi = (data >> 8) as u8;
+        self.mem_write(addr, lo);
+        self.mem_write(addr + 1, hi);
+    }
+
     pub fn run(&mut self) {
         loop {
             let op_code = self.mem_read(self.program_counter);
@@ -47,6 +63,20 @@ impl CPU {
 
             self.program_counter += 1;
         }
+    }
+
+    pub fn reset(&mut self) {
+        self.register_a = 0;
+        self.register_x = 0;
+        self.register_y = 0;
+        self.status = 0;
+        self.program_counter = self.mem_read_u16(0xFFFC);
+    }
+
+    pub fn load_and_run(&mut self, program: Vec<u8>) {
+        self.load(program);
+        self.reset();
+        self.run();
     }
 
     pub fn set_status_flag(&mut self, value: u8) {
@@ -81,5 +111,30 @@ mod cpu_tests {
         assert_eq!(cpu.register_x, 0x16);
         assert_eq!(cpu.status, 0b0000_0000);
         assert_eq!(cpu.program_counter, 0x8004);
+    }
+
+    #[test]
+    pub fn read_and_write_little_endian_memory() {
+        let mut cpu = CPU::new();
+        // cpu.program_counter = 0x8000;
+
+        cpu.mem_write_u16(0x8000, 0xABCD);
+        assert_eq!(cpu.mem_read_u16(0x8000), 0xABCD);
+    }
+
+    #[test]
+    pub fn reset_cpu() {
+        let mut cpu = CPU::new();
+        cpu.register_a = 0x99;
+        cpu.register_x = 0xAA;
+        cpu.status = 0xAB;
+        cpu.memory[0xFFFC] = 0xCD;
+        cpu.memory[0xFFFD] = 0xAB;
+
+        cpu.reset();
+        assert_eq!(cpu.register_a, 0);
+        assert_eq!(cpu.register_x, 0);
+        assert_eq!(cpu.status, 0);
+        assert_eq!(cpu.program_counter, 0xABCD);
     }
 }

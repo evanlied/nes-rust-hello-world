@@ -1,6 +1,7 @@
 use super::CPU;
 
 impl CPU {
+    // LDA
     pub fn load_register_a(&mut self) {
         self.program_counter += 1;
         let param = &self.memory[self.program_counter as usize];
@@ -9,6 +10,7 @@ impl CPU {
         self.set_status_flag(*param);
     }
 
+    // TAX
     pub fn transfer_a_to_x(&mut self) {
         self.register_x = self.register_a;
         self.set_status_flag(self.register_x);
