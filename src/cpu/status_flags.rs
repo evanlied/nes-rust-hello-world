@@ -20,7 +20,7 @@ impl StatusFlag {
         }
     }
 
-    pub fn set_carry_flag(&mut self, value: u8) {
+    pub fn set_negative_flag(&mut self, value: u8) {
          // If the value is negative, set the negative flag to 1 otherwise set it to 0
          if value & 0b1000_0000 != 0 {
             self.0 = self.0 | 0b1000_0000;
@@ -29,8 +29,16 @@ impl StatusFlag {
         }
     }
 
-    pub fn set_carry_and_zero_flag(&mut self, value: u8) {
+    pub fn set_carry_flag(&mut self, value: u8) {
+        if value & 0b1000_0000 != 0 {
+            self.0 = self.0 | 0b0000_0001;
+        } else {
+            self.0 = self.0 & 0b1111_1110;
+        }
+    }
+
+    pub fn set_negative_and_zero_flag(&mut self, value: u8) {
         self.set_zero_flag(value);
-        self.set_carry_flag(value);
+        self.set_negative_flag(value);
     }
 }

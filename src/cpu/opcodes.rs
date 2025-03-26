@@ -27,6 +27,13 @@ pub static OP_CODE_REF_TABLE: phf::Map<u8, OpCode> = phf_map! {
     0x21u8 => OpCode::new("AND", 2, 6, AddressingMode::IndirectX),
     0x31u8 => OpCode::new("AND", 2, 5, AddressingMode::IndirectY),
 
+    // ASL
+    0x0Au8 => OpCode::new("ASL", 1, 2, AddressingMode::Accumulator),
+    0x06u8 => OpCode::new("ASL", 2, 5, AddressingMode::ZeroPage),
+    0x16u8 => OpCode::new("ASL", 2, 6, AddressingMode::ZeroPageX),
+    0x0Eu8 => OpCode::new("ASL", 3, 6, AddressingMode::Absolute),
+    0x1Eu8 => OpCode::new("ASL", 3, 7, AddressingMode::AbsoluteX),
+
     // LDA
     0xA9u8 => OpCode::new("LDA", 2, 2, AddressingMode::Immediate),
     0xA5u8 => OpCode::new("LDA", 2, 3, AddressingMode::ZeroPage),

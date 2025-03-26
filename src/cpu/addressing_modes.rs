@@ -3,6 +3,7 @@ use super::CPU;
 #[derive(Clone)]
 pub enum AddressingMode {
     Immediate,
+    Accumulator,
     ZeroPage,
     ZeroPageX,
     ZeroPageY,

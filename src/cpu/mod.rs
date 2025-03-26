@@ -64,23 +64,16 @@ impl CPU {
                 .expect(&format!("${op_code} is not a valid operation"));
             self.program_counter += 1;
             match op_code_params.instruction {
-                "AND" => {
-                    self.and(op_code_params.addressing_mode.clone());
-                    self.program_counter += op_code_params.bytes - 1;
-                },
-                "LDA" => {
-                    self.load_register_a(op_code_params.addressing_mode.clone());
-                    self.program_counter += op_code_params.bytes - 1;
-                },
-                "STA" => {
-                    self.store_register_a(op_code_params.addressing_mode.clone());
-                    self.program_counter += op_code_params.bytes - 1;
-                },
+                "AND" => self.and(op_code_params.addressing_mode.clone()),
+                "ASL" => self.arithmetic_shift_left(op_code_params.addressing_mode.clone()),
+                "LDA" => self.load_register_a(op_code_params.addressing_mode.clone()),
+                "STA" => self.store_register_a(op_code_params.addressing_mode.clone()),
                 "TAX" => self.transfer_a_to_x(),
                 "INX" => self.increment_x(),
                 "BRK" => return,
                 _=> println!("TODO for ${op_code}"), 
             }
+            self.program_counter += op_code_params.bytes - 1;
         }
     }
 
@@ -134,6 +127,16 @@ mod cpu_tests {
 
         assert_eq!(cpu.register_a, 0b00001010);
         assert_eq!(cpu.program_counter, 0x8005);
+    }
+
+    #[test]
+    pub fn asl_instruction() {
+        let mut cpu = CPU::new();
+        cpu.mem_write_u16(0xFFFC, 0x8000);
+        cpu.load_and_run(vec!(0xA9, 0b1011_0001, 0x0A, 0x00));
+
+        assert_eq!(cpu.register_a, 0b0110_0010);
+        assert_eq!(cpu.program_counter, 0x8004);
     }
 
     #[test]

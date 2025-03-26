@@ -5,7 +5,7 @@ impl CPU {
         let addr = self.get_operand_address(&mode);
         let param = self.mem_read(addr);
         self.register_a = self.register_a & param;
-        self.status.set_carry_and_zero_flag(self.register_a);
+        self.status.set_negative_and_zero_flag(self.register_a);
         // self.set_status_flag(self.register_a);
     }
 }
