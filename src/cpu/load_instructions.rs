@@ -8,13 +8,13 @@ impl CPU {
         let param = self.mem_read(addr);
         self.register_a = param;
 
-        self.set_status_flag(param);
+        self.status.set_carry_and_zero_flag(param);
     }
 
     // TAX
     pub fn transfer_a_to_x(&mut self) {
         self.register_x = self.register_a;
-        self.set_status_flag(self.register_x);
+        self.status.set_carry_and_zero_flag(self.register_a);
     }
 }
 
@@ -29,7 +29,7 @@ mod load_tests {
         cpu.load(test_program);
 
         cpu.run();
-        assert_eq!(cpu.status, 0b0000_0010);
+        assert_eq!(cpu.status.0, 0b0000_0010);
     }
 
     #[test]
@@ -39,6 +39,6 @@ mod load_tests {
         cpu.load(test_program);
 
         cpu.run();
-        assert_eq!(cpu.status, 0b1000_0000);
+        assert_eq!(cpu.status.0, 0b1000_0000);
     }
 }

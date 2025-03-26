@@ -3,15 +3,17 @@ mod store_instructions;
 mod arithmetic_instructions;
 mod logical_instructions;
 mod addressing_modes;
+mod status_flags;
 mod opcodes;
 
 use opcodes::OP_CODE_REF_TABLE;
+use status_flags::StatusFlag;
 
 pub struct CPU {
     pub register_a: u8,
     pub register_x: u8,
     pub register_y: u8,
-    pub status: u8,
+    pub status: StatusFlag,
     pub program_counter: u16,
     memory: [u8; 0xFFFF],
 }
@@ -22,7 +24,7 @@ impl CPU {
             register_a: 0,
             register_x: 0,
             register_y: 0,
-            status: 0,
+            status: StatusFlag(0),
             program_counter: 0,
             memory: [0; 0xFFFF],
         }
@@ -86,7 +88,7 @@ impl CPU {
         self.register_a = 0;
         self.register_x = 0;
         self.register_y = 0;
-        self.status = 0;
+        self.status = StatusFlag(0);
         self.program_counter = self.mem_read_u16(0xFFFC);
     }
 
@@ -94,22 +96,6 @@ impl CPU {
         self.load(program);
         self.reset();
         self.run();
-    }
-
-    pub fn set_status_flag(&mut self, value: u8) {
-        // If the value is zero set the zero flag to 1 otherwise set it to 0
-        if value == 0 {
-            self.status = self.status | 0b0000_0010;
-        } else {
-            self.status = self.status & 0b1111_1101;
-        }
-
-        // If the value is negative, set the negative flag to 1 otherwise set it to 0
-        if value & 0b1000_0000 != 0 {
-            self.status = self.status | 0b1000_0000;
-        } else {
-            self.status = self.status & 0b0111_1111;
-        }
     }
 }
 
@@ -126,7 +112,7 @@ mod cpu_tests {
         cpu.run();
         assert_eq!(cpu.register_a, 0x15);
         assert_eq!(cpu.register_x, 0x16);
-        assert_eq!(cpu.status, 0b0000_0000);
+        assert_eq!(cpu.status.0, 0b0000_0000);
         assert_eq!(cpu.program_counter, 0x8005);
     }
 
@@ -164,14 +150,14 @@ mod cpu_tests {
         let mut cpu = CPU::new();
         cpu.register_a = 0x99;
         cpu.register_x = 0xAA;
-        cpu.status = 0xAB;
+        cpu.status.0 = 0xAB;
         cpu.memory[0xFFFC] = 0xCD;
         cpu.memory[0xFFFD] = 0xAB;
 
         cpu.reset();
         assert_eq!(cpu.register_a, 0);
         assert_eq!(cpu.register_x, 0);
-        assert_eq!(cpu.status, 0);
+        assert_eq!(cpu.status.0, 0);
         assert_eq!(cpu.program_counter, 0xABCD);
     }
 }
