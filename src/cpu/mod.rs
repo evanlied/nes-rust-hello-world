@@ -1,10 +1,10 @@
 mod load_instructions;
 mod store_instructions;
 mod arithmetic_instructions;
+mod logical_instructions;
 mod addressing_modes;
 mod opcodes;
 
-use addressing_modes::AddressingMode;
 use opcodes::OP_CODE_REF_TABLE;
 
 pub struct CPU {
@@ -62,6 +62,10 @@ impl CPU {
                 .expect(&format!("${op_code} is not a valid operation"));
             self.program_counter += 1;
             match op_code_params.instruction {
+                "AND" => {
+                    self.and(op_code_params.addressing_mode.clone());
+                    self.program_counter += op_code_params.bytes - 1;
+                },
                 "LDA" => {
                     self.load_register_a(op_code_params.addressing_mode.clone());
                     self.program_counter += op_code_params.bytes - 1;
@@ -133,6 +137,16 @@ mod cpu_tests {
         cpu.load_and_run(vec!(0xA9, 0x15, 0x85, 0x15, 0x00));
 
         assert_eq!(cpu.mem_read(0x15), 0x15);
+        assert_eq!(cpu.program_counter, 0x8005);
+    }
+
+    #[test]
+    pub fn and_instruction() {
+        let mut cpu = CPU::new();
+        cpu.mem_write_u16(0xFFFC, 0x8000);
+        cpu.load_and_run(vec!(0xA9, 0b0001111, 0x29, 0b11111010, 0x00));
+
+        assert_eq!(cpu.register_a, 0b00001010);
         assert_eq!(cpu.program_counter, 0x8005);
     }
 
