@@ -2,7 +2,7 @@ use super::{addressing_modes::AddressingMode, CPU};
 
 impl CPU {
     pub fn increment_x(&mut self) {
-        self.register_x += 1;
+        self.register_x = self.register_x.wrapping_add(1);
         self.status.set_negative_and_zero_flag(self.register_x);
     }
 

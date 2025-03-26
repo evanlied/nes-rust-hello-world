@@ -41,4 +41,22 @@ impl StatusFlag {
         self.set_zero_flag(value);
         self.set_negative_flag(value);
     }
+
+    pub fn is_carry_set(&self) -> bool {
+        self.0 & 0b0000_0001 != 0
+    }
+}
+
+#[cfg(test)]
+mod status_flag_tests {
+    use super::*;
+
+    #[test]
+    pub fn is_carry_set_test() {
+        let status = StatusFlag(0b0000_0001);
+        assert!(status.is_carry_set());
+
+        let status = StatusFlag(0b0000_0000);
+        assert!(!status.is_carry_set());
+    }
 }

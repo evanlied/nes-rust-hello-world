@@ -34,6 +34,9 @@ pub static OP_CODE_REF_TABLE: phf::Map<u8, OpCode> = phf_map! {
     0x0Eu8 => OpCode::new("ASL", 3, 6, AddressingMode::Absolute),
     0x1Eu8 => OpCode::new("ASL", 3, 7, AddressingMode::AbsoluteX),
 
+    // Branching
+    0x90u8 => OpCode::new("BCC", 2, 2, AddressingMode::Relative),
+
     // LDA
     0xA9u8 => OpCode::new("LDA", 2, 2, AddressingMode::Immediate),
     0xA5u8 => OpCode::new("LDA", 2, 3, AddressingMode::ZeroPage),

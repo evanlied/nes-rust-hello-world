@@ -1,5 +1,6 @@
 mod load_instructions;
 mod store_instructions;
+mod branching_instructions;
 mod arithmetic_instructions;
 mod logical_instructions;
 mod addressing_modes;
@@ -66,6 +67,10 @@ impl CPU {
             match op_code_params.instruction {
                 "AND" => self.and(op_code_params.addressing_mode.clone()),
                 "ASL" => self.arithmetic_shift_left(op_code_params.addressing_mode.clone()),
+                "BCC" => {
+                    self.branch_if_carry_clear();
+                    continue // continue in order not to increment by one at end of run loop
+                },
                 "LDA" => self.load_register_a(op_code_params.addressing_mode.clone()),
                 "STA" => self.store_register_a(op_code_params.addressing_mode.clone()),
                 "TAX" => self.transfer_a_to_x(),
@@ -137,6 +142,15 @@ mod cpu_tests {
 
         assert_eq!(cpu.register_a, 0b0110_0010);
         assert_eq!(cpu.program_counter, 0x8004);
+    }
+
+    #[test]
+    pub fn bcc_instruction() {
+        let mut cpu = CPU::new();
+        cpu.mem_write_u16(0xFFFC, 0x8001);
+        cpu.load_and_run(vec!(0x00, 0x90, 0b1111_1101, 0x00)); // subtracts 2 from PC to get back to BRK command at 0x8000
+
+        assert_eq!(cpu.program_counter, 0x8001);
     }
 
     #[test]

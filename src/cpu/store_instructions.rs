@@ -4,7 +4,6 @@ impl CPU {
     // sta
     pub fn store_register_a(&mut self, mode: AddressingMode) {
         let addr = self.get_operand_address(&mode);
-        println!("${addr}");
         self.mem_write(addr, self.register_a);
     }
 }
