@@ -72,6 +72,9 @@ impl CPU {
                 },
                 "BCS" => {
                     if self.branch_if_carry_set() { continue; }
+                },
+                "BEQ" => {
+                    if self.branch_if_equal() { continue; }
                 }
                 "LDA" => self.load_register_a(op_code_params.addressing_mode.clone()),
                 "STA" => self.store_register_a(op_code_params.addressing_mode.clone()),
@@ -162,6 +165,15 @@ mod cpu_tests {
         cpu.load_and_run(vec!(0x00, 0xA9, 0b10000000, 0x0A, 0xB0, 0b1111_1010, 0x00)); // subtracts 6 from PC to get back to BRK command at 0x8000
 
         assert_eq!(cpu.program_counter, 0x8001);
+    }
+
+    #[test]
+    pub fn beq_instruction() {
+        let mut cpu = CPU::new();
+        cpu.mem_write_u16(0xFFFC, 0x8001);
+        cpu.load_and_run(vec!(0x00, 0xA9, 0x00, 0xF0, 0b1111_1011, 0x00));
+
+        assert_eq!(cpu.program_counter, 0x8001)
     }
 
     #[test]

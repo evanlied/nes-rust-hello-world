@@ -37,6 +37,7 @@ pub static OP_CODE_REF_TABLE: phf::Map<u8, OpCode> = phf_map! {
     // Branching
     0x90u8 => OpCode::new("BCC", 2, 2, AddressingMode::Relative),
     0xB0u8 => OpCode::new("BCS", 2, 2, AddressingMode::Relative),
+    0xF0u8 => OpCode::new("BEQ", 2, 2, AddressingMode::Relative),
 
     // LDA
     0xA9u8 => OpCode::new("LDA", 2, 2, AddressingMode::Immediate),

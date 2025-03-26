@@ -14,6 +14,12 @@ impl CPU {
         return true;
     }
 
+    pub fn branch_if_equal(&mut self) -> bool {
+        if !self.status.is_zero_set() { return false; }
+        self.branch();
+        return true;
+    }
+
     fn branch(&mut self) {
         let displacement = self.mem_read(self.program_counter) as i8; // cast as an i8 to retain signed value
         self.program_counter = self.program_counter
@@ -53,6 +59,21 @@ mod branching_tests {
 
         cpu.status.0 = 0b0000_0001; // Cary flag set, will branch
         cpu.branch_if_carry_set();
+        assert_eq!(cpu.program_counter, 0x7FFE);
+    }
+
+    #[test]
+    pub fn branch_if_equal() {
+        let mut cpu = CPU::new();
+        cpu.program_counter = 0x8000;
+        cpu.mem_write(0x8000, 0b1111_1101);
+
+        cpu.status.0 = 0; // Zero flag not set, will not branch
+        cpu.branch_if_equal();
+        assert_eq!(cpu.program_counter, 0x8000);
+
+        cpu.status.0 = 0b0000_0010; // Zero flag is set, will branch
+        cpu.branch_if_equal();
         assert_eq!(cpu.program_counter, 0x7FFE);
     }
 }
