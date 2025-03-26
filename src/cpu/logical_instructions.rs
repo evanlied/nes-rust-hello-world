@@ -21,16 +21,23 @@ mod logical_tests {
         cpu.mem_write(0x8000, 0b0110_0110);
         cpu.and(AddressingMode::Immediate);
         assert_eq!(cpu.register_a, 0b0110_0000);
+        assert_eq!(cpu.status, 0);
+        // Do another AND to make sure the status flag is set to 0
+        cpu.mem_write(0x8000, 0);
+        cpu.and(AddressingMode::Immediate);
+        assert_eq!(cpu.register_a, 0);
+        assert_eq!(cpu.status, 0b0000_0010);
     }
 
     #[test]
     pub fn logical_and_zeropage() {
         let mut cpu = CPU::new();
-        cpu.register_a = 0b0110_1001;
+        cpu.register_a = 0b1110_1001;
         cpu.program_counter = 0x8000;
         cpu.mem_write(0x8000, 0xAC);
-        cpu.mem_write(0x00AC, 0b0110_0110);
+        cpu.mem_write(0x00AC, 0b1110_0110);
         cpu.and(AddressingMode::ZeroPage);
-        assert_eq!(cpu.register_a, 0b0110_0000);
+        assert_eq!(cpu.register_a, 0b1110_0000);
+        assert_eq!(cpu.status, 0b1000_0000);
     }
 }
