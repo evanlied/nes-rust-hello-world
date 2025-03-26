@@ -1,5 +1,6 @@
 use super::CPU;
 
+#[derive(Clone)]
 pub enum AddressingMode {
     Immediate,
     ZeroPage,
@@ -10,6 +11,7 @@ pub enum AddressingMode {
     AbsoluteY,
     IndirectX,
     IndirectY,
+    Implied,
     NoneAddressing,
 }
 

@@ -2,8 +2,10 @@ mod load_instructions;
 mod store_instructions;
 mod arithmetic_instructions;
 mod addressing_modes;
+mod opcodes;
 
 use addressing_modes::AddressingMode;
+use opcodes::OP_CODE_REF_TABLE;
 
 pub struct CPU {
     pub register_a: u8,
@@ -56,72 +58,21 @@ impl CPU {
     pub fn run(&mut self) {
         loop {
             let op_code = self.mem_read(self.program_counter);
+            let op_code_params = OP_CODE_REF_TABLE.get(&op_code)
+                .expect(&format!("${op_code} is not a valid operation"));
             self.program_counter += 1;
-            println!("Found opcode ${op_code}");
-            match op_code {
-                0xA9 => {
-                    self.load_register_a(AddressingMode::Immediate);
-                    self.program_counter += 1;
+            match op_code_params.instruction {
+                "LDA" => {
+                    self.load_register_a(op_code_params.addressing_mode.clone());
+                    self.program_counter += op_code_params.bytes - 1;
                 },
-                0xA5 => {
-                    self.load_register_a(AddressingMode::ZeroPage);
-                    self.program_counter += 1;
+                "STA" => {
+                    self.store_register_a(op_code_params.addressing_mode.clone());
+                    self.program_counter += op_code_params.bytes - 1;
                 },
-                0xB5 => {
-                    self.load_register_a(AddressingMode::ZeroPageX);
-                    self.program_counter += 1;
-                },
-                0xAD => {
-                    self.load_register_a(AddressingMode::Absolute);
-                    self.program_counter += 2;
-                },
-                0xBD => {
-                    self.load_register_a(AddressingMode::AbsoluteX);
-                    self.program_counter += 2;
-                },
-                0xB9 => {
-                    self.load_register_a(AddressingMode::AbsoluteY);
-                    self.program_counter +=2;
-                },
-                0xA1 => {
-                    self.load_register_a(AddressingMode::IndirectX);
-                    self.program_counter += 1;
-                }
-                0xB1 => {
-                    self.load_register_a(AddressingMode::IndirectY);
-                    self.program_counter += 1;
-                },
-                0x85 => {
-                    self.store_register_a(AddressingMode::ZeroPage);
-                    self.program_counter += 1;
-                },
-                0x95 => {
-                    self.store_register_a(AddressingMode::ZeroPageX);
-                    self.program_counter += 1;
-                },
-                0x8D => {
-                    self.store_register_a(AddressingMode::Absolute);
-                    self.program_counter += 2;
-                },
-                0x9D => {
-                    self.store_register_a(AddressingMode::AbsoluteX);
-                    self.program_counter += 2;
-                },
-                0x99 => {
-                    self.store_register_a(AddressingMode::AbsoluteY);
-                    self.program_counter += 2;
-                },
-                0x81 => {
-                    self.store_register_a(AddressingMode::IndirectX);
-                    self.program_counter += 1;
-                },
-                0x91 => {
-                    self.store_register_a(AddressingMode::IndirectY);
-                    self.program_counter += 1;
-                },
-                0xAA => self.transfer_a_to_x(),
-                0xE8 => self.increment_x(),
-                0x00 => return,
+                "TAX" => self.transfer_a_to_x(),
+                "INX" => self.increment_x(),
+                "BRK" => return,
                 _=> println!("TODO for ${op_code}"), 
             }
         }
