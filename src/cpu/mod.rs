@@ -68,9 +68,11 @@ impl CPU {
                 "AND" => self.and(op_code_params.addressing_mode.clone()),
                 "ASL" => self.arithmetic_shift_left(op_code_params.addressing_mode.clone()),
                 "BCC" => {
-                    self.branch_if_carry_clear();
-                    continue // continue in order not to increment by one at end of run loop
+                    if self.branch_if_carry_clear() { continue; }
                 },
+                "BCS" => {
+                    if self.branch_if_carry_set() { continue; }
+                }
                 "LDA" => self.load_register_a(op_code_params.addressing_mode.clone()),
                 "STA" => self.store_register_a(op_code_params.addressing_mode.clone()),
                 "TAX" => self.transfer_a_to_x(),
@@ -148,7 +150,16 @@ mod cpu_tests {
     pub fn bcc_instruction() {
         let mut cpu = CPU::new();
         cpu.mem_write_u16(0xFFFC, 0x8001);
-        cpu.load_and_run(vec!(0x00, 0x90, 0b1111_1101, 0x00)); // subtracts 2 from PC to get back to BRK command at 0x8000
+        cpu.load_and_run(vec!(0x00, 0x90, 0b1111_1101, 0x00)); // subtracts 3 from PC to get back to BRK command at 0x8000
+
+        assert_eq!(cpu.program_counter, 0x8001);
+    }
+
+    #[test]
+    pub fn bcs_instruction() {
+        let mut cpu = CPU::new();
+        cpu.mem_write_u16(0xFFFC, 0x8001);
+        cpu.load_and_run(vec!(0x00, 0xA9, 0b10000000, 0x0A, 0xB0, 0b1111_1010, 0x00)); // subtracts 6 from PC to get back to BRK command at 0x8000
 
         assert_eq!(cpu.program_counter, 0x8001);
     }
