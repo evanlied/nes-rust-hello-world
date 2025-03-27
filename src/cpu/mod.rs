@@ -79,6 +79,7 @@ impl CPU {
                 "CLC" => self.status.set_carry_flag(0),
                 "CLD" => self.status.set_decimal_flag(false),
                 "CLI" => self.status.set_interrupt_flag(false),
+                "CLV" => self.status.set_overflow_flag(0),
                 "LDA" => self.load_register_a(op_code_params.addressing_mode.clone()),
                 "STA" => self.store_register_a(op_code_params.addressing_mode.clone()),
                 "TAX" => self.transfer_a_to_x(),
@@ -265,6 +266,17 @@ mod cpu_tests {
         cpu.run();
         
         assert_eq!(cpu.status.0, 0b1111_1011);
+        assert_eq!(cpu.program_counter, 0x8002);
+    }
+
+    #[test]
+    pub fn clv_instruction() {
+        let mut cpu = CPU::new();
+        cpu.status.0 = 0xFF;
+        cpu.load(vec!(0xB8, 0x00));
+        cpu.run();
+        
+        assert_eq!(cpu.status.0, 0b1011_1111);
         assert_eq!(cpu.program_counter, 0x8002);
     }
 
