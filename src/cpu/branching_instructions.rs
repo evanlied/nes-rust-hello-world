@@ -4,39 +4,40 @@ impl CPU {
     // Branch instructions return a bool to let the main body know whether to skip consuming or current PC or not
     pub fn branch_if_carry_clear(&mut self) -> bool {
         if self.status.is_carry_set() { return false; }
-        self.branch();
-        return true;
+        self.branch()
     }
 
     pub fn branch_if_carry_set(&mut self) -> bool {
         if !self.status.is_carry_set() { return false; }
-        self.branch();
-        return true;
+        self.branch()
     }
 
     pub fn branch_if_equal(&mut self) -> bool {
         if !self.status.is_zero_set() { return false; }
-        self.branch();
-        return true;
+        self.branch()
     }
 
     pub fn branch_if_not_equal(&mut self) -> bool {
         if self.status.is_zero_set() { return false; }
-        self.branch();
-        return true;
+        self.branch()
     }
 
     pub fn branch_if_minus(&mut self) -> bool {
         if !self.status.is_negative_set() { return false; }
-        self.branch();
-        return true;
+        self.branch()
     }
 
-    fn branch(&mut self) {
+    pub fn branch_if_positive(&mut self) -> bool {
+        if self.status.is_negative_set() { return false; }
+        self.branch()
+    }
+
+    fn branch(&mut self) -> bool {
         let displacement = self.mem_read(self.program_counter) as i8; // cast as an i8 to retain signed value
         self.program_counter = self.program_counter
             .wrapping_add(1) // Consumes the current program counter. Make sure not to increment in main cpu cycle body
             .wrapping_add(displacement as u16); // casting to u16 will retain the binary value even when adding
+        true
     }
 }
 
@@ -116,6 +117,21 @@ mod branching_tests {
 
         cpu.status.0 = 0b10000000;
         cpu.branch_if_minus();
+        assert_eq!(cpu.program_counter, 0x7FFE);
+    }
+
+    #[test]
+    pub fn branch_if_positive() {
+        let mut cpu = CPU::new();
+        cpu.program_counter = 0x8000;
+        cpu.mem_write(0x8000, 0b1111_1101);
+
+        cpu.status.0 = 0b1000_0000; // Is negative, will not branch
+        cpu.branch_if_positive();
+        assert_eq!(cpu.program_counter, 0x8000);
+
+        cpu.status.0 = 0;
+        cpu.branch_if_positive();
         assert_eq!(cpu.program_counter, 0x7FFE);
     }
 }
