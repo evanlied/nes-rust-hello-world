@@ -76,9 +76,8 @@ impl CPU {
                 "BEQ" => {
                     if self.branch_if_equal() { continue; }
                 },
-                "BIT" => {
-                    self.bit_test(op_code_params.addressing_mode.clone());
-                },
+                "BIT" => self.bit_test(op_code_params.addressing_mode.clone()),
+                "BMI" => if self.branch_if_minus() { continue; },
                 "LDA" => self.load_register_a(op_code_params.addressing_mode.clone()),
                 "STA" => self.store_register_a(op_code_params.addressing_mode.clone()),
                 "TAX" => self.transfer_a_to_x(),
@@ -187,6 +186,15 @@ mod cpu_tests {
         cpu.load_and_run(vec!(0xA9, 0x0F, 0x2C, 0xAB, 0xAB, 0x00));
 
         assert_eq!(cpu.status.0, 0b11000000);
+    }
+
+    #[test]
+    pub fn bmi_instruction() {
+        let mut cpu = CPU::new();
+        cpu.mem_write_u16(0xFFFC, 0x8001);
+        cpu.load_and_run(vec!(0x00, 0xA9, 0xCC, 0x30, 0b1111_1011, 0x00));
+
+        assert_eq!(cpu.program_counter, 0x8001);
     }
 
     #[test]

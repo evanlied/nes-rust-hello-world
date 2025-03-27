@@ -58,6 +58,10 @@ impl StatusFlag {
     pub fn is_zero_set(&self) -> bool {
         self.0 & 0b0000_0010 != 0
     }
+
+    pub fn is_negative_set(&self) -> bool {
+        self.0 & 0b1000_0000 != 0
+    }
 }
 
 #[cfg(test)]
