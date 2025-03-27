@@ -18,6 +18,14 @@ impl CPU {
         self.status.set_overflow_flag(param);
         self.status.set_negative_flag(param);
     }
+
+    pub fn exclusive_or(&mut self, mode: AddressingMode) {
+        let addr = self.get_operand_address(&mode);
+        let param = self.mem_read(addr);
+        let result = self.register_a ^ param;
+        self.register_a = result;
+        self.status.set_negative_and_zero_flag(result);
+    }
 }
 
 #[cfg(test)]
@@ -62,5 +70,17 @@ mod logical_tests {
         cpu.bit_test(AddressingMode::ZeroPage);
         
         assert_eq!(cpu.status.0, 0b1100_0000);
+    }
+
+    #[test]
+    pub fn eclusive_or_test() {
+        let mut cpu = CPU::new();
+        cpu.register_a = 0b1001_1001;
+        cpu.program_counter = 0x8000;
+        cpu.mem_write(0x8000, 0xAB);
+        cpu.mem_write(0xAB, 0b0000_1111);
+        cpu.exclusive_or(AddressingMode::ZeroPage);
+        assert_eq!(cpu.register_a, 0b1001_0110);
+        assert_eq!(cpu.status.0, 0b1000_0000);
     }
 }

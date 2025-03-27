@@ -86,6 +86,7 @@ impl CPU {
                 "DEC" => self.decrement_mem(op_code_params.addressing_mode.clone()),
                 "DEX" => self.decrement_x(),
                 "DEY" => self.decrement_y(),
+                "EOR" => self.exclusive_or(op_code_params.addressing_mode.clone()),
                 "LDA" => self.load_register_a(op_code_params.addressing_mode.clone()),
                 "STA" => self.store_register_a(op_code_params.addressing_mode.clone()),
                 "TAX" => self.transfer_a_to_x(),
@@ -352,6 +353,16 @@ mod cpu_tests {
         assert_eq!(cpu.register_y, 0);
         assert_eq!(cpu.status.0, 0b0000_0010);
         assert_eq!(cpu.program_counter, 0x8002);
+    }
+
+    #[test]
+    pub fn eor_instruction() {
+        let mut cpu = CPU::new();
+        cpu.mem_write_u16(0xFFFC, 0x8000);
+        cpu.load_and_run(vec!(0xA9, 0xFF, 0x49, 0b1010_1010, 0x00));
+        assert_eq!(cpu.program_counter, 0x8005);
+        assert_eq!(cpu.register_a, 0b0101_0101);
+        assert_eq!(cpu.status.0, 0);
     }
 
     // ------------------------------------------------------------

@@ -86,6 +86,16 @@ pub static OP_CODE_REF_TABLE: phf::Map<u8, OpCode> = phf_map! {
     // DEY
     0x88u8 => OpCode::new("DEY", 1, 2, AddressingMode::Implied),
 
+    // EOR
+    0x49u8 => OpCode::new("EOR", 2, 2, AddressingMode::Immediate),
+    0x45u8 => OpCode::new("EOR", 2, 3, AddressingMode::ZeroPage),
+    0x55u8 => OpCode::new("EOR", 2, 4, AddressingMode::ZeroPageX),
+    0x4Du8 => OpCode::new("EOR", 3, 4, AddressingMode::Absolute),
+    0x5Du8 => OpCode::new("EOR", 3, 4, AddressingMode::AbsoluteX),
+    0x59u8 => OpCode::new("EOR", 3, 4, AddressingMode::AbsoluteY),
+    0x41u8 => OpCode::new("EOR", 2, 6, AddressingMode::IndirectX),
+    0x51u8 => OpCode::new("EOR", 2, 5, AddressingMode::IndirectY),
+
     // LDA
     0xA9u8 => OpCode::new("LDA", 2, 2, AddressingMode::Immediate),
     0xA5u8 => OpCode::new("LDA", 2, 3, AddressingMode::ZeroPage),
