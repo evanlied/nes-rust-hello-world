@@ -16,7 +16,7 @@ impl CPU {
         self.status.set_negative_and_zero_flag(self.register_y);
     }
 
-    pub fn increment_mem(&mut self, mode: AddressingMode) {
+    pub fn increment_mem(&mut self, mode: &AddressingMode) {
         let addr = self.get_operand_address(&mode);
         let param = self.mem_read(addr);
         let result = param.wrapping_add(1);
@@ -25,7 +25,7 @@ impl CPU {
         self.status.set_negative_and_zero_flag(result);
     }
 
-    pub fn decrement_mem(&mut self, mode: AddressingMode) {
+    pub fn decrement_mem(&mut self, mode: &AddressingMode) {
         let addr = self.get_operand_address(&mode);
         let param = self.mem_read(addr);
         let result = param.wrapping_sub(1);
@@ -34,7 +34,7 @@ impl CPU {
         self.status.set_negative_and_zero_flag(result);
     }
 
-    pub fn arithmetic_shift_left(&mut self, mode: AddressingMode) {
+    pub fn arithmetic_shift_left(&mut self, mode: &AddressingMode) {
         // For AddressingMode Accumulator, shift and overwrite reg A, otherwise shift and overwrite in memory
         let (old_val, mem_ptr): (u8, &mut u8) = match mode {
             AddressingMode::Accumulator => (self.register_a, &mut self.register_a),
@@ -50,19 +50,19 @@ impl CPU {
         self.status.set_negative_and_zero_flag(new_val);
     }
 
-    pub fn compare(&mut self, mode: AddressingMode) {
+    pub fn compare(&mut self, mode: &AddressingMode) {
         self._compare(mode, self.register_a);
     }
 
-    pub fn compare_x(&mut self, mode: AddressingMode) {
+    pub fn compare_x(&mut self, mode: &AddressingMode) {
         self._compare(mode, self.register_x);
     }
 
-    pub fn compare_y(&mut self, mode: AddressingMode) {
+    pub fn compare_y(&mut self, mode: &AddressingMode) {
         self._compare(mode, self.register_y);
     }
 
-    fn _compare(&mut self, mode: AddressingMode, reg_val: u8) {
+    fn _compare(&mut self, mode: &AddressingMode, reg_val: u8) {
         let addr = self.get_operand_address(&mode);
         let param = self.mem_read(addr);
         self.status.set_carry_flag(reg_val >= param);
@@ -109,7 +109,7 @@ mod arithmetic_test {
         cpu.program_counter = 0x8000;
         cpu.mem_write(0x8000, 0xDC);
         cpu.mem_write(0xDC, 0xFF);
-        cpu.increment_mem(AddressingMode::ZeroPage);
+        cpu.increment_mem(&AddressingMode::ZeroPage);
         assert_eq!(cpu.mem_read(0xDC), 0x0);
         assert_eq!(cpu.status.0, 0b0000_0010);
     }
@@ -121,7 +121,7 @@ mod arithmetic_test {
         cpu.register_x = 0x2;
         cpu.mem_write(0x8000, 0xA9);
         cpu.mem_write(0xAB, 0x1);
-        cpu.decrement_mem(AddressingMode::ZeroPageX);
+        cpu.decrement_mem(&AddressingMode::ZeroPageX);
         assert_eq!(cpu.mem_read(0xAB), 0);
         assert_eq!(cpu.status.0, 0b0000_0010);
     }
@@ -130,14 +130,14 @@ mod arithmetic_test {
     pub fn arithmetic_shift_left_test() {
         let mut cpu = CPU::new();
         cpu.register_a = 0b11111001;
-        cpu.arithmetic_shift_left(AddressingMode::Accumulator);
+        cpu.arithmetic_shift_left(&AddressingMode::Accumulator);
         assert_eq!(cpu.register_a, 0b1111_0010);
         assert_eq!(cpu.status.0, 0b1000_0001);
 
         cpu.mem_write(0xAA, 0b1000_0000); // value to shift
         cpu.mem_write(0x8000, 0xAA); // zero page memory address
         cpu.program_counter = 0x8000;
-        cpu.arithmetic_shift_left(AddressingMode::ZeroPage);
+        cpu.arithmetic_shift_left(&AddressingMode::ZeroPage);
         assert_eq!(cpu.mem_read(0xAA), 0b0000_0000);
         assert_eq!(cpu.status.0, 0b0000_0011);
     }
@@ -149,7 +149,7 @@ mod arithmetic_test {
         cpu.program_counter = 0x8000;
         cpu.mem_write(0x8000, 0xAB);
         cpu.mem_write(0x00AB, 0x15);
-        cpu.compare(AddressingMode::ZeroPage);
+        cpu.compare(&AddressingMode::ZeroPage);
 
         assert_eq!(cpu.status.0, 0b1000_0001);
     }
@@ -160,7 +160,7 @@ mod arithmetic_test {
         cpu.register_x = 0x15;
         cpu.program_counter = 0x8000;
         cpu.mem_write(0x8000, 0xA0);
-        cpu.compare_x(AddressingMode::Immediate);
+        cpu.compare_x(&AddressingMode::Immediate);
         
         assert_eq!(cpu.status.0, 0b0000_0000);
     }
@@ -171,7 +171,7 @@ mod arithmetic_test {
         cpu.register_y = 0x15;
         cpu.program_counter = 0x8000;
         cpu.mem_write(0x8000, 0x10);
-        cpu.compare_y(AddressingMode::Immediate);
+        cpu.compare_y(&AddressingMode::Immediate);
 
         assert_eq!(cpu.status.0, 0b0000_0001);
     }

@@ -3,7 +3,7 @@ use super::addressing_modes::AddressingMode;
 
 impl CPU {
     // LDA
-    pub fn load_register_a(&mut self, mode: AddressingMode) {
+    pub fn load_register_a(&mut self, mode: &AddressingMode) {
         let addr = self.get_operand_address(&mode);
         let param = self.mem_read(addr);
         self.register_a = param;
@@ -11,7 +11,7 @@ impl CPU {
         self.status.set_negative_and_zero_flag(param);
     }
 
-    pub fn load_register_x(&mut self, mode: AddressingMode) {
+    pub fn load_register_x(&mut self, mode: &AddressingMode) {
         let addr = self.get_operand_address(&mode);
         let param = self.mem_read(addr);
         self.register_x = param;
@@ -19,7 +19,7 @@ impl CPU {
         self.status.set_negative_and_zero_flag(param);
     }
 
-    pub fn load_register_y(&mut self, mode: AddressingMode) {
+    pub fn load_register_y(&mut self, mode: &AddressingMode) {
         let addr = self.get_operand_address(&mode);
         let param = self.mem_read(addr);
         self.register_y = param;
@@ -65,7 +65,7 @@ mod load_tests {
         cpu.register_y = 2;
         cpu.mem_write(0x8000, 0xA0);
         cpu.mem_write(0xA2, 0xDC);
-        cpu.load_register_x(AddressingMode::ZeroPageY);
+        cpu.load_register_x(&AddressingMode::ZeroPageY);
         assert_eq!(cpu.register_x, 0xDC);
         assert_eq!(cpu.status.0, 0b1000_0000);
     }
@@ -77,7 +77,7 @@ mod load_tests {
         cpu.register_x = 2;
         cpu.mem_write_u16(0x8000, 0x7000);
         cpu.mem_write(0x7002, 0xC);
-        cpu.load_register_y(AddressingMode::AbsoluteX);
+        cpu.load_register_y(&AddressingMode::AbsoluteX);
         assert_eq!(cpu.register_y, 0xC);
         assert_eq!(cpu.status.0, 0);
     }
