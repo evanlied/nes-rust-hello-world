@@ -82,6 +82,7 @@ impl CPU {
                 "CLV" => self.status.set_overflow_flag(0),
                 "CMP" => self.compare(op_code_params.addressing_mode.clone()),
                 "CPX" => self.compare_x(op_code_params.addressing_mode.clone()),
+                "CPY" => self.compare_y(op_code_params.addressing_mode.clone()),
                 "LDA" => self.load_register_a(op_code_params.addressing_mode.clone()),
                 "STA" => self.store_register_a(op_code_params.addressing_mode.clone()),
                 "TAX" => self.transfer_a_to_x(),
@@ -303,6 +304,18 @@ mod cpu_tests {
 
         assert_eq!(cpu.program_counter, 0x8004);
         assert_eq!(cpu.status.0, 0b0000_0011);
+    }
+
+    #[test]
+    pub fn cpy_instruction() {
+        let mut cpu = CPU::new();
+        cpu.register_y = 0xAB;
+        cpu.mem_write_u16(0x7000, 0xA0);
+        cpu.load(vec!(0xCC, 0x0, 0x70, 0x00));
+        cpu.run();
+
+        assert_eq!(cpu.program_counter, 0x8004);
+        assert_eq!(cpu.status.0, 0b0000_0001);
     }
 
     #[test]

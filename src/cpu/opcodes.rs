@@ -64,10 +64,15 @@ pub static OP_CODE_REF_TABLE: phf::Map<u8, OpCode> = phf_map! {
     0xC1u8 => OpCode::new("CMP", 2, 6, AddressingMode::IndirectX),
     0xD1u8 => OpCode::new("CMP", 2, 5, AddressingMode::IndirectY),
 
-    //CPX
+    // CPX
     0xE0u8 => OpCode::new("CPX", 2, 2, AddressingMode::Immediate),
     0xE4u8 => OpCode::new("CPX", 2, 3, AddressingMode::ZeroPage),
     0xEcu8 => OpCode::new("CPX", 3, 4, AddressingMode::Absolute),
+
+    // CPY
+    0xC0u8 => OpCode::new("CPY", 2, 2, AddressingMode::Immediate),
+    0xC4u8 => OpCode::new("CPY", 2, 3, AddressingMode::ZeroPage),
+    0xCCu8 => OpCode::new("CPY", 3, 4, AddressingMode::Absolute),
 
     // LDA
     0xA9u8 => OpCode::new("LDA", 2, 2, AddressingMode::Immediate),

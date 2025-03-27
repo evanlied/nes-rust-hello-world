@@ -23,22 +23,24 @@ impl CPU {
     }
 
     pub fn compare(&mut self, mode: AddressingMode) {
-        let addr = self.get_operand_address(&mode);
-        let param = self.mem_read(addr);
-        self.status.set_carry_flag(self.register_a >= param);
-
-        let result = self.register_a.wrapping_sub(param);
-        self.status.set_negative_and_zero_flag(result);
+        self._compare(mode, self.register_a);
     }
 
     pub fn compare_x(&mut self, mode: AddressingMode) {
+        self._compare(mode, self.register_x);
+    }
+
+    pub fn compare_y(&mut self, mode: AddressingMode) {
+        self._compare(mode, self.register_y);
+    }
+
+    fn _compare(&mut self, mode: AddressingMode, reg_val: u8) {
         let addr = self.get_operand_address(&mode);
         let param = self.mem_read(addr);
-        self.status.set_carry_flag(self.register_x >= param);
+        self.status.set_carry_flag(reg_val >= param);
 
-        let result = self.register_x.wrapping_sub(param);
+        let result = reg_val.wrapping_sub(param);
         self.status.set_negative_and_zero_flag(result);
-        println!("Result is {} and status is {}", result, self.status.0);
     }
 }
 
@@ -92,6 +94,17 @@ mod arithmetic_test {
         cpu.compare_x(AddressingMode::Immediate);
         
         assert_eq!(cpu.status.0, 0b0000_0000);
+    }
+    
+    #[test]
+    pub fn compare_y_test() {
+        let mut cpu = CPU::new();
+        cpu.register_y = 0x15;
+        cpu.program_counter = 0x8000;
+        cpu.mem_write(0x8000, 0x10);
+        cpu.compare_y(AddressingMode::Immediate);
+
+        assert_eq!(cpu.status.0, 0b0000_0001);
     }
 
 }
