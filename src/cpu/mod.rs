@@ -84,6 +84,7 @@ impl CPU {
                 "CPX" => self.compare_x(op_code_params.addressing_mode.clone()),
                 "CPY" => self.compare_y(op_code_params.addressing_mode.clone()),
                 "DEC" => self.decrement_mem(op_code_params.addressing_mode.clone()),
+                "DEX" => self.decrement_x(),
                 "LDA" => self.load_register_a(op_code_params.addressing_mode.clone()),
                 "STA" => self.store_register_a(op_code_params.addressing_mode.clone()),
                 "TAX" => self.transfer_a_to_x(),
@@ -328,6 +329,17 @@ mod cpu_tests {
 
         assert_eq!(cpu.mem_read(0x7000), 154);
         assert_eq!(cpu.status.0, 0b1000_0000);
+        assert_eq!(cpu.program_counter, 0x8004);
+    }
+
+    #[test]
+    pub fn dex_instruction() {
+        let mut cpu = CPU::new();
+        cpu.mem_write_u16(0xFFFC, 0x8000);
+        cpu.load_and_run(vec!(0xCA, 0x00));
+        assert_eq!(cpu.register_x, 0xFF);
+        assert_eq!(cpu.status.0, 0b1000_0000);
+        assert_eq!(cpu.program_counter, 0x8002);
     }
 
     // ------------------------------------------------------------

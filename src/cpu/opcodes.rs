@@ -80,6 +80,9 @@ pub static OP_CODE_REF_TABLE: phf::Map<u8, OpCode> = phf_map! {
     0xCEu8 => OpCode::new("DEC", 3, 6, AddressingMode::Absolute),
     0xDEu8 => OpCode::new("DEC", 3, 7, AddressingMode::AbsoluteX),
 
+    // DEX
+    0xCAu8 => OpCode::new("DEX", 1, 2, AddressingMode::Implied),
+
     // LDA
     0xA9u8 => OpCode::new("LDA", 2, 2, AddressingMode::Immediate),
     0xA5u8 => OpCode::new("LDA", 2, 3, AddressingMode::ZeroPage),

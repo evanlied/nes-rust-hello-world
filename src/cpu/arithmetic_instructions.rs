@@ -6,6 +6,11 @@ impl CPU {
         self.status.set_negative_and_zero_flag(self.register_x);
     }
 
+    pub fn decrement_x(&mut self) {
+        self.register_x = self.register_x.wrapping_sub(1);
+        self.status.set_negative_and_zero_flag(self.register_x);
+    }
+
     pub fn decrement_mem(&mut self, mode: AddressingMode) {
         let addr = self.get_operand_address(&mode);
         let param = self.mem_read(addr);
@@ -65,6 +70,15 @@ mod arithmetic_test {
         cpu.increment_x();
         assert_eq!(cpu.register_x, 0b10000000);
         assert_eq!(cpu.status.0, 0b10000000);
+    }
+
+    #[test]
+    pub fn decrement_x_test() {
+        let mut cpu = CPU::new();
+        cpu.register_x = 155;
+        cpu.decrement_x();
+        assert_eq!(cpu.register_x, 154);
+        assert_eq!(cpu.status.0, 0b1000_0000);
     }
 
     #[test]
