@@ -67,17 +67,12 @@ impl CPU {
             match op_code_params.instruction {
                 "AND" => self.and(op_code_params.addressing_mode.clone()),
                 "ASL" => self.arithmetic_shift_left(op_code_params.addressing_mode.clone()),
-                "BCC" => {
-                    if self.branch_if_carry_clear() { continue; }
-                },
-                "BCS" => {
-                    if self.branch_if_carry_set() { continue; }
-                },
-                "BEQ" => {
-                    if self.branch_if_equal() { continue; }
-                },
+                "BCC" => if self.branch_if_carry_clear() { continue; },
+                "BCS" => if self.branch_if_carry_set() { continue; },
+                "BEQ" => if self.branch_if_equal() { continue; },
                 "BIT" => self.bit_test(op_code_params.addressing_mode.clone()),
                 "BMI" => if self.branch_if_minus() { continue; },
+                "BNE" => if self.branch_if_not_equal() { continue; },
                 "LDA" => self.load_register_a(op_code_params.addressing_mode.clone()),
                 "STA" => self.store_register_a(op_code_params.addressing_mode.clone()),
                 "TAX" => self.transfer_a_to_x(),
@@ -193,6 +188,15 @@ mod cpu_tests {
         let mut cpu = CPU::new();
         cpu.mem_write_u16(0xFFFC, 0x8001);
         cpu.load_and_run(vec!(0x00, 0xA9, 0xCC, 0x30, 0b1111_1011, 0x00));
+
+        assert_eq!(cpu.program_counter, 0x8001);
+    }
+
+    #[test]
+    pub fn bne_instruction() {
+        let mut cpu = CPU::new();
+        cpu.mem_write_u16(0xFFFC, 0x8001);
+        cpu.load_and_run(vec!(0x00, 0xA9, 0x01, 0xD0, 0b1111_1011, 0x00));
 
         assert_eq!(cpu.program_counter, 0x8001);
     }

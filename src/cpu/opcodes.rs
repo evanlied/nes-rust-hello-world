@@ -39,6 +39,7 @@ pub static OP_CODE_REF_TABLE: phf::Map<u8, OpCode> = phf_map! {
     0xB0u8 => OpCode::new("BCS", 2, 2, AddressingMode::Relative),
     0xF0u8 => OpCode::new("BEQ", 2, 2, AddressingMode::Relative),
     0x30u8 => OpCode::new("BMI", 2, 2, AddressingMode::Relative),
+    0xD0u8 => OpCode::new("BNE", 2, 2, AddressingMode::Relative),
 
     // BIT
     0x24u8 => OpCode::new("BIT", 2, 3, AddressingMode::ZeroPage),

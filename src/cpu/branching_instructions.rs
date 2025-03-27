@@ -20,6 +20,12 @@ impl CPU {
         return true;
     }
 
+    pub fn branch_if_not_equal(&mut self) -> bool {
+        if self.status.is_zero_set() { return false; }
+        self.branch();
+        return true;
+    }
+
     pub fn branch_if_minus(&mut self) -> bool {
         if !self.status.is_negative_set() { return false; }
         self.branch();
@@ -80,6 +86,21 @@ mod branching_tests {
 
         cpu.status.0 = 0b0000_0010; // Zero flag is set, will branch
         cpu.branch_if_equal();
+        assert_eq!(cpu.program_counter, 0x7FFE);
+    }
+
+    #[test]
+    pub fn branch_if_not_equal() {
+        let mut cpu = CPU::new();
+        cpu.program_counter = 0x8000;
+        cpu.mem_write(0x8000, 0b1111_1101); // Subtracts 3 from program counter
+
+        cpu.status.0 = 0b0000_0010; // Zero flag is set, will not branch
+        cpu.branch_if_not_equal();
+        assert_eq!(cpu.program_counter, 0x8000);
+
+        cpu.status.0 = 0;
+        cpu.branch_if_not_equal();
         assert_eq!(cpu.program_counter, 0x7FFE);
     }
 
