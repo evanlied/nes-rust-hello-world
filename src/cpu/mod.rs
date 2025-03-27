@@ -83,6 +83,7 @@ impl CPU {
                 "CMP" => self.compare(op_code_params.addressing_mode.clone()),
                 "CPX" => self.compare_x(op_code_params.addressing_mode.clone()),
                 "CPY" => self.compare_y(op_code_params.addressing_mode.clone()),
+                "DEC" => self.decrement_mem(op_code_params.addressing_mode.clone()),
                 "LDA" => self.load_register_a(op_code_params.addressing_mode.clone()),
                 "STA" => self.store_register_a(op_code_params.addressing_mode.clone()),
                 "TAX" => self.transfer_a_to_x(),
@@ -317,6 +318,21 @@ mod cpu_tests {
         assert_eq!(cpu.program_counter, 0x8004);
         assert_eq!(cpu.status.0, 0b0000_0001);
     }
+
+    #[test]
+    pub fn dec_instruction() {
+        let mut cpu = CPU::new();
+        cpu.mem_write_u16(0xFFFC, 0x8000);
+        cpu.mem_write(0x7000, 155);
+        cpu.load_and_run(vec!(0xCE, 0x0, 0x70, 0x00));
+
+        assert_eq!(cpu.mem_read(0x7000), 154);
+        assert_eq!(cpu.status.0, 0b1000_0000);
+    }
+
+    // ------------------------------------------------------------
+    // END OF INSTRUCTION TEST SECTION
+    // ------------------------------------------------------------
 
     #[test]
     pub fn read_and_write_little_endian_memory() {
