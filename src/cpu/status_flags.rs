@@ -11,6 +11,14 @@ impl Deref for StatusFlag {
 }
 
 impl StatusFlag {
+    pub fn set_carry_flag(&mut self, value: u8) {
+        if value & 0b1000_0000 != 0 {
+            self.0 = self.0 | 0b0000_0001;
+        } else {
+            self.0 = self.0 & 0b1111_1110;
+        }
+    }
+
     pub fn set_zero_flag(&mut self, value: u8) {
         // If the value is zero set the zero flag to 1 otherwise set it to 0
         if value == 0 {
@@ -20,20 +28,21 @@ impl StatusFlag {
         }
     }
 
+    pub fn set_overflow_flag(&mut self, value: u8) {
+        // TODO might need to change the set conditions at a later point
+        if value & 0b0100_0000 != 0 {
+            self.0 = self.0 | 0b0100_0000;
+        } else {
+            self.0 = self.0 & 0b1011_1111;
+        }
+    }
+
     pub fn set_negative_flag(&mut self, value: u8) {
          // If the value is negative, set the negative flag to 1 otherwise set it to 0
          if value & 0b1000_0000 != 0 {
             self.0 = self.0 | 0b1000_0000;
         } else {
             self.0 = self.0 & 0b0111_1111;
-        }
-    }
-
-    pub fn set_carry_flag(&mut self, value: u8) {
-        if value & 0b1000_0000 != 0 {
-            self.0 = self.0 | 0b0000_0001;
-        } else {
-            self.0 = self.0 & 0b1111_1110;
         }
     }
 

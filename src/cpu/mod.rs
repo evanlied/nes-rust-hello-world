@@ -75,7 +75,10 @@ impl CPU {
                 },
                 "BEQ" => {
                     if self.branch_if_equal() { continue; }
-                }
+                },
+                "BIT" => {
+                    self.bit_test(op_code_params.addressing_mode.clone());
+                },
                 "LDA" => self.load_register_a(op_code_params.addressing_mode.clone()),
                 "STA" => self.store_register_a(op_code_params.addressing_mode.clone()),
                 "TAX" => self.transfer_a_to_x(),
@@ -174,6 +177,16 @@ mod cpu_tests {
         cpu.load_and_run(vec!(0x00, 0xA9, 0x00, 0xF0, 0b1111_1011, 0x00));
 
         assert_eq!(cpu.program_counter, 0x8001)
+    }
+
+    #[test]
+    pub fn bit_instruction() {
+        let mut cpu = CPU::new();
+        cpu.mem_write_u16(0xFFFC, 0x8000);
+        cpu.mem_write(0xABAB, 0b1101_1010);
+        cpu.load_and_run(vec!(0xA9, 0x0F, 0x2C, 0xAB, 0xAB, 0x00));
+
+        assert_eq!(cpu.status.0, 0b11000000);
     }
 
     #[test]
