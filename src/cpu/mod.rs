@@ -75,6 +75,7 @@ impl CPU {
                 "BNE" => if self.branch_if_not_equal() { continue; },
                 "BPL" => if self.branch_if_positive() { continue; },
                 "BVC" => if self.branch_if_overflow_clear() { continue; },
+                "BVS" => if self.branch_if_overflow_set() { continue; },
                 "LDA" => self.load_register_a(op_code_params.addressing_mode.clone()),
                 "STA" => self.store_register_a(op_code_params.addressing_mode.clone()),
                 "TAX" => self.transfer_a_to_x(),
@@ -218,6 +219,16 @@ mod cpu_tests {
         cpu.mem_write_u16(0xFFFC, 0x8001);
         cpu.mem_write(0xAB, 0b1011_0000);
         cpu.load_and_run(vec!(0x00, 0xA9, 0x00, 0x24, 0xAB, 0x50, (7 as i8).wrapping_neg() as u8, 0x00));
+
+        assert_eq!(cpu.program_counter, 0x8001);
+    }
+
+    #[test]
+    pub fn bvs_instruction() {
+        let mut cpu = CPU::new();
+        cpu.mem_write_u16(0xFFFC, 0x8001);
+        cpu.mem_write(0xAB, 0b1111_0000);
+        cpu.load_and_run(vec!(0x00, 0xA9, 0x00, 0x24, 0xAB, 0x70, (7 as i8).wrapping_neg() as u8, 0x00));
 
         assert_eq!(cpu.program_counter, 0x8001);
     }
