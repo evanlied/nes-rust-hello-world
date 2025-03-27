@@ -51,6 +51,7 @@ pub static OP_CODE_REF_TABLE: phf::Map<u8, OpCode> = phf_map! {
     // Flag Controls
     0x18u8 => OpCode::new("CLC", 1, 2, AddressingMode::Implied),
     0xD8u8 => OpCode::new("CLD", 1, 2, AddressingMode::Implied),
+    0x58u8 => OpCode::new("CLI", 1, 2, AddressingMode::Implied),
 
     // LDA
     0xA9u8 => OpCode::new("LDA", 2, 2, AddressingMode::Immediate),

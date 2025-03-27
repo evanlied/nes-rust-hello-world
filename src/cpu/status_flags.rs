@@ -28,6 +28,14 @@ impl StatusFlag {
         }
     }
 
+    pub fn set_interrupt_flag(&mut self, value: bool) {
+        if value {
+            self.0 = self.0 | 0b0000_0100;
+        } else {
+            self.0 = self.0 & 0b1111_1011;
+        }
+    }
+
     pub fn set_decimal_flag(&mut self, value: bool) {
         if value {
             self.0 = self.0 | 0b0000_1000;
@@ -65,6 +73,10 @@ impl StatusFlag {
 
     pub fn is_zero_set(&self) -> bool {
         self.0 & 0b0000_0010 != 0
+    }
+
+    pub fn is_interrupt_set(&self) -> bool {
+        self.0 & 0b0000_0100 != 0
     }
 
     pub fn is_decimal_set(&self) -> bool {
