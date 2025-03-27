@@ -77,6 +77,7 @@ impl CPU {
                 "BVC" => if self.branch_if_overflow_clear() { continue; },
                 "BVS" => if self.branch_if_overflow_set() { continue; },
                 "CLC" => self.status.set_carry_flag(0),
+                "CLD" => self.status.set_decimal_flag(false),
                 "LDA" => self.load_register_a(op_code_params.addressing_mode.clone()),
                 "STA" => self.store_register_a(op_code_params.addressing_mode.clone()),
                 "TAX" => self.transfer_a_to_x(),
@@ -242,6 +243,16 @@ mod cpu_tests {
 
         assert_eq!(cpu.status.0, 0b0000_0000);
         assert_eq!(cpu.program_counter, 0x8005);
+    }
+
+    #[test]
+    pub fn cld_instruction() {
+        let mut cpu = CPU::new();
+        cpu.status.0 = 0xFF;
+        cpu.load(vec!(0xD8, 0x00));
+        cpu.run();
+
+        assert_eq!(cpu.status.0, 0b1111_0111);
     }
 
     #[test]

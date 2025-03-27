@@ -28,6 +28,14 @@ impl StatusFlag {
         }
     }
 
+    pub fn set_decimal_flag(&mut self, value: bool) {
+        if value {
+            self.0 = self.0 | 0b0000_1000;
+        } else {
+            self.0 = self.0 & 0b1111_0111;
+        }
+    }
+
     pub fn set_overflow_flag(&mut self, value: u8) {
         // TODO might need to change the set conditions at a later point
         if value & 0b0100_0000 != 0 {
@@ -57,6 +65,10 @@ impl StatusFlag {
 
     pub fn is_zero_set(&self) -> bool {
         self.0 & 0b0000_0010 != 0
+    }
+
+    pub fn is_decimal_set(&self) -> bool {
+        self.0 & 0b0000_1000 != 0
     }
 
     pub fn is_overflow_set(&self) -> bool {
