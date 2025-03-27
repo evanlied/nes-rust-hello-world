@@ -32,6 +32,11 @@ impl CPU {
         self.branch()
     }
 
+    pub fn branch_if_overflow_clear(&mut self) -> bool {
+        if self.status.is_overflow_set() { return false; }
+        self.branch()
+    }
+
     fn branch(&mut self) -> bool {
         let displacement = self.mem_read(self.program_counter) as i8; // cast as an i8 to retain signed value
         self.program_counter = self.program_counter
@@ -132,6 +137,21 @@ mod branching_tests {
 
         cpu.status.0 = 0;
         cpu.branch_if_positive();
+        assert_eq!(cpu.program_counter, 0x7FFE);
+    }
+
+    #[test]
+    pub fn branch_if_overflow_clear() {
+        let mut cpu = CPU::new();
+        cpu.program_counter = 0x8000;
+        cpu.mem_write(0x8000, 0b1111_1101);
+
+        cpu.status.0 = 0b0100_0000; // Overflow is set, will not branch
+        cpu.branch_if_overflow_clear();
+        assert_eq!(cpu.program_counter, 0x8000);
+
+        cpu.status.0 = 0;
+        cpu.branch_if_overflow_clear();
         assert_eq!(cpu.program_counter, 0x7FFE);
     }
 }
