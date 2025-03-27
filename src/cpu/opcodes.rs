@@ -48,6 +48,9 @@ pub static OP_CODE_REF_TABLE: phf::Map<u8, OpCode> = phf_map! {
     0x24u8 => OpCode::new("BIT", 2, 3, AddressingMode::ZeroPage),
     0x2Cu8 => OpCode::new("BIT", 3, 4, AddressingMode::Absolute),
 
+    // Flag Controls
+    0x18u8 => OpCode::new("CLC", 1, 2, AddressingMode::Implied),
+
     // LDA
     0xA9u8 => OpCode::new("LDA", 2, 2, AddressingMode::Immediate),
     0xA5u8 => OpCode::new("LDA", 2, 3, AddressingMode::ZeroPage),

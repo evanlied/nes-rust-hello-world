@@ -76,6 +76,7 @@ impl CPU {
                 "BPL" => if self.branch_if_positive() { continue; },
                 "BVC" => if self.branch_if_overflow_clear() { continue; },
                 "BVS" => if self.branch_if_overflow_set() { continue; },
+                "CLC" => self.status.set_carry_flag(0),
                 "LDA" => self.load_register_a(op_code_params.addressing_mode.clone()),
                 "STA" => self.store_register_a(op_code_params.addressing_mode.clone()),
                 "TAX" => self.transfer_a_to_x(),
@@ -231,6 +232,16 @@ mod cpu_tests {
         cpu.load_and_run(vec!(0x00, 0xA9, 0x00, 0x24, 0xAB, 0x70, (7 as i8).wrapping_neg() as u8, 0x00));
 
         assert_eq!(cpu.program_counter, 0x8001);
+    }
+    
+    #[test]
+    pub fn clc_instruction() {
+        let mut cpu = CPU::new();
+        cpu.mem_write_u16(0xFFFC, 0x8000);
+        cpu.load_and_run(vec!(0xA9, 0b1011_0001, 0x0A, 0x18, 0x00));
+
+        assert_eq!(cpu.status.0, 0b0000_0000);
+        assert_eq!(cpu.program_counter, 0x8005);
     }
 
     #[test]
