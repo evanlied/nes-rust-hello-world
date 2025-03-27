@@ -30,6 +30,16 @@ impl CPU {
         let result = self.register_a.wrapping_sub(param);
         self.status.set_negative_and_zero_flag(result);
     }
+
+    pub fn compare_x(&mut self, mode: AddressingMode) {
+        let addr = self.get_operand_address(&mode);
+        let param = self.mem_read(addr);
+        self.status.set_carry_flag(self.register_x >= param);
+
+        let result = self.register_x.wrapping_sub(param);
+        self.status.set_negative_and_zero_flag(result);
+        println!("Result is {} and status is {}", result, self.status.0);
+    }
 }
 
 #[cfg(test)]
@@ -71,6 +81,17 @@ mod arithmetic_test {
         cpu.compare(AddressingMode::ZeroPage);
 
         assert_eq!(cpu.status.0, 0b1000_0001);
+    }
+
+    #[test]
+    pub fn compare_x_test() {
+        let mut cpu = CPU::new();
+        cpu.register_x = 0x15;
+        cpu.program_counter = 0x8000;
+        cpu.mem_write(0x8000, 0xA0);
+        cpu.compare_x(AddressingMode::Immediate);
+        
+        assert_eq!(cpu.status.0, 0b0000_0000);
     }
 
 }
