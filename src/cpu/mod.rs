@@ -76,10 +76,11 @@ impl CPU {
                 "BPL" => if self.branch_if_positive() { continue; },
                 "BVC" => if self.branch_if_overflow_clear() { continue; },
                 "BVS" => if self.branch_if_overflow_set() { continue; },
-                "CLC" => self.status.set_carry_flag(0),
+                "CLC" => self.status.set_carry_flag(false),
                 "CLD" => self.status.set_decimal_flag(false),
                 "CLI" => self.status.set_interrupt_flag(false),
                 "CLV" => self.status.set_overflow_flag(0),
+                "CMP" => self.compare(op_code_params.addressing_mode.clone()),
                 "LDA" => self.load_register_a(op_code_params.addressing_mode.clone()),
                 "STA" => self.store_register_a(op_code_params.addressing_mode.clone()),
                 "TAX" => self.transfer_a_to_x(),
@@ -278,6 +279,17 @@ mod cpu_tests {
         
         assert_eq!(cpu.status.0, 0b1011_1111);
         assert_eq!(cpu.program_counter, 0x8002);
+    }
+
+    #[test]
+    pub fn cmp_instruction() {
+        let mut cpu = CPU::new();
+        cpu.mem_write_u16(0xFFFC, 0x8000);
+        cpu.mem_write_u16(0x7000, 0x15);
+        cpu.load_and_run(vec!(0xA9, 0xA0, 0xCD, 0x00, 0x70, 0x00));
+
+        assert_eq!(cpu.program_counter, 0x8006);
+        assert_eq!(cpu.status.0, 0b1000_0001);
     }
 
     #[test]

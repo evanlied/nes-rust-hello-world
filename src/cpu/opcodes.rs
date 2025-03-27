@@ -54,6 +54,16 @@ pub static OP_CODE_REF_TABLE: phf::Map<u8, OpCode> = phf_map! {
     0x58u8 => OpCode::new("CLI", 1, 2, AddressingMode::Implied),
     0xB8u8 => OpCode::new("CLV", 1, 2, AddressingMode::Implied),
 
+    // CMP
+    0xC9u8 => OpCode::new("CMP", 2, 2, AddressingMode::Immediate),
+    0xC5u8 => OpCode::new("CMP", 2, 3, AddressingMode::ZeroPage),
+    0xD5u8 => OpCode::new("CMP", 2, 4, AddressingMode::ZeroPageX),
+    0xCDu8 => OpCode::new("CMP", 3, 4, AddressingMode::Absolute),
+    0xDDu8 => OpCode::new("CMP", 3, 4, AddressingMode::AbsoluteX),
+    0xD9u8 => OpCode::new("CMP", 3, 4, AddressingMode::AbsoluteY),
+    0xC1u8 => OpCode::new("CMP", 2, 6, AddressingMode::IndirectX),
+    0xD1u8 => OpCode::new("CMP", 2, 5, AddressingMode::IndirectY),
+
     // LDA
     0xA9u8 => OpCode::new("LDA", 2, 2, AddressingMode::Immediate),
     0xA5u8 => OpCode::new("LDA", 2, 3, AddressingMode::ZeroPage),

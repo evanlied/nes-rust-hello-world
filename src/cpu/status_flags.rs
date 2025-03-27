@@ -11,8 +11,9 @@ impl Deref for StatusFlag {
 }
 
 impl StatusFlag {
-    pub fn set_carry_flag(&mut self, value: u8) {
-        if value & 0b1000_0000 != 0 {
+    pub fn set_carry_flag(&mut self, value: bool) {
+        // if value & 0b1000_0000 != 0 {
+        if value {
             self.0 = self.0 | 0b0000_0001;
         } else {
             self.0 = self.0 & 0b1111_1110;
