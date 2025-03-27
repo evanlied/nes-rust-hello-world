@@ -89,6 +89,7 @@ impl CPU {
                 "EOR" => self.exclusive_or(&op_code_params.addressing_mode),
                 "INC" => self.increment_mem(&op_code_params.addressing_mode),
                 "INX" => self.increment_x(),
+                "INY" => self.increment_y(),
                 "LDA" => self.load_register_a(&op_code_params.addressing_mode),
                 "LDX" => self.load_register_x(&op_code_params.addressing_mode),
                 "LDY" => self.load_register_y(&op_code_params.addressing_mode),
@@ -376,6 +377,16 @@ mod cpu_tests {
         cpu.load_and_run(vec!(0xEE, 0x0, 0x70, 0x00));
         assert_eq!(cpu.program_counter, 0x8004);
         assert_eq!(cpu.mem_read(0x7000), 0xD3);
+        assert_eq!(cpu.status.0, 0b1000_0000);
+    }
+
+    #[test]
+    pub fn iny_instruction() {
+        let mut cpu = CPU::new();
+        cpu.mem_write_u16(0xFFFC, 0x8000);
+        cpu.load_and_run(vec!(0xA0, 210, 0xC8, 0x00));
+        assert_eq!(cpu.program_counter, 0x8004);
+        assert_eq!(cpu.register_y, 211);
         assert_eq!(cpu.status.0, 0b1000_0000);
     }
 

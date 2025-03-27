@@ -11,6 +11,11 @@ impl CPU {
         self.status.set_negative_and_zero_flag(self.register_x);
     }
 
+    pub fn increment_y(&mut self) {
+        self.register_y = self.register_y.wrapping_add(1);
+        self.status.set_negative_and_zero_flag(self.register_y);
+    }
+
     pub fn decrement_y(&mut self) {
         self.register_y = self.register_y.wrapping_sub(1);
         self.status.set_negative_and_zero_flag(self.register_y);
@@ -92,6 +97,15 @@ mod arithmetic_test {
         cpu.decrement_x();
         assert_eq!(cpu.register_x, 154);
         assert_eq!(cpu.status.0, 0b1000_0000);
+    }
+
+    #[test]
+    pub fn increment_y_test() {
+        let mut cpu = CPU::new();
+        cpu.register_y = 0xFF;
+        cpu.increment_y();
+        assert_eq!(cpu.register_y, 0);
+        assert_eq!(cpu.status.0, 0b0000_0010);
     }
 
     #[test]
