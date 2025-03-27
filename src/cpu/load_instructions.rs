@@ -11,6 +11,14 @@ impl CPU {
         self.status.set_negative_and_zero_flag(param);
     }
 
+    pub fn load_register_x(&mut self, mode: AddressingMode) {
+        let addr = self.get_operand_address(&mode);
+        let param = self.mem_read(addr);
+        self.register_x = param;
+
+        self.status.set_negative_and_zero_flag(param);
+    }
+
     // TAX
     pub fn transfer_a_to_x(&mut self) {
         self.register_x = self.register_a;
@@ -39,6 +47,18 @@ mod load_tests {
         cpu.load(test_program);
 
         cpu.run();
+        assert_eq!(cpu.status.0, 0b1000_0000);
+    }
+
+    #[test]
+    pub fn ldx_test() {
+        let mut cpu = CPU::new();
+        cpu.program_counter = 0x8000;
+        cpu.register_y = 2;
+        cpu.mem_write(0x8000, 0xA0);
+        cpu.mem_write(0xA2, 0xDC);
+        cpu.load_register_x(AddressingMode::ZeroPageY);
+        assert_eq!(cpu.register_x, 0xDC);
         assert_eq!(cpu.status.0, 0b1000_0000);
     }
 }

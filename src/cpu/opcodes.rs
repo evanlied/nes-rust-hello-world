@@ -106,6 +106,13 @@ pub static OP_CODE_REF_TABLE: phf::Map<u8, OpCode> = phf_map! {
     0xA1u8 => OpCode::new("LDA", 2, 6, AddressingMode::IndirectX),
     0xB1u8 => OpCode::new("LDA", 2, 5, AddressingMode::IndirectY),
 
+    // LDX
+    0xA2u8 => OpCode::new("LDX", 2, 2, AddressingMode::Immediate),
+    0xA6u8 => OpCode::new("LDX", 2, 3, AddressingMode::ZeroPage),
+    0xB6u8 => OpCode::new("LDX", 2, 4, AddressingMode::ZeroPageY),
+    0xAEu8 => OpCode::new("LDX", 2, 4, AddressingMode::Absolute),
+    0xBEu8 => OpCode::new("LDX", 3, 4, AddressingMode::AbsoluteY),
+ 
     // STA
     0x85u8 => OpCode::new("STA", 2, 3, AddressingMode::ZeroPage),
     0x95u8 => OpCode::new("STA", 2, 4, AddressingMode::ZeroPageX),
