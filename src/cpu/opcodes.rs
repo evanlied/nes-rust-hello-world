@@ -96,6 +96,15 @@ pub static OP_CODE_REF_TABLE: phf::Map<u8, OpCode> = phf_map! {
     0x41u8 => OpCode::new("EOR", 2, 6, AddressingMode::IndirectX),
     0x51u8 => OpCode::new("EOR", 2, 5, AddressingMode::IndirectY),
 
+    // INC
+    0xE6u8 => OpCode::new("INC", 2, 5, AddressingMode::ZeroPage),
+    0xF6u8 => OpCode::new("INC", 2, 6, AddressingMode::ZeroPageX),
+    0xEEu8 => OpCode::new("INC", 3, 6, AddressingMode::Absolute),
+    0xFEu8 => OpCode::new("INC", 3, 7, AddressingMode::AbsoluteX),
+
+    // INX
+    0xE8u8 => OpCode::new("INX", 1, 2, AddressingMode::Implied),
+
     // LDA
     0xA9u8 => OpCode::new("LDA", 2, 2, AddressingMode::Immediate),
     0xA5u8 => OpCode::new("LDA", 2, 3, AddressingMode::ZeroPage),
@@ -131,9 +140,6 @@ pub static OP_CODE_REF_TABLE: phf::Map<u8, OpCode> = phf_map! {
 
     // TAX
     0xAAu8 => OpCode::new("TAX", 1, 2, AddressingMode::Implied),
-
-    // INX
-    0xE8u8 => OpCode::new("INX", 1, 2, AddressingMode::Implied),
 
     // BRK
     0x00u8 => OpCode::new("BRK", 1, 7, AddressingMode::Implied),

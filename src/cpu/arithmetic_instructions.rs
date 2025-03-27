@@ -16,12 +16,20 @@ impl CPU {
         self.status.set_negative_and_zero_flag(self.register_y);
     }
 
+    pub fn increment_mem(&mut self, mode: AddressingMode) {
+        let addr = self.get_operand_address(&mode);
+        let param = self.mem_read(addr);
+        let result = param.wrapping_add(1);
+
+        self.mem_write(addr, result);
+        self.status.set_negative_and_zero_flag(result);
+    }
+
     pub fn decrement_mem(&mut self, mode: AddressingMode) {
         let addr = self.get_operand_address(&mode);
         let param = self.mem_read(addr);
         let result = param.wrapping_sub(1);
 
-        println!("Addr is {:#x} and param is {param:#x}", addr);
         self.mem_write(addr, result);
         self.status.set_negative_and_zero_flag(result);
     }
@@ -93,6 +101,17 @@ mod arithmetic_test {
         cpu.decrement_y();
         assert_eq!(cpu.register_y, 54);
         assert_eq!(cpu.status.0, 0b0000_0000);
+    }
+
+    #[test]
+    pub fn increment_memory_test() {
+        let mut cpu = CPU::new();
+        cpu.program_counter = 0x8000;
+        cpu.mem_write(0x8000, 0xDC);
+        cpu.mem_write(0xDC, 0xFF);
+        cpu.increment_mem(AddressingMode::ZeroPage);
+        assert_eq!(cpu.mem_read(0xDC), 0x0);
+        assert_eq!(cpu.status.0, 0b0000_0010);
     }
 
     #[test]

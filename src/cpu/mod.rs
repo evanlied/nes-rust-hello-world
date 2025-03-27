@@ -87,12 +87,13 @@ impl CPU {
                 "DEX" => self.decrement_x(),
                 "DEY" => self.decrement_y(),
                 "EOR" => self.exclusive_or(op_code_params.addressing_mode.clone()),
+                "INC" => self.increment_mem(op_code_params.addressing_mode.clone()),
+                "INX" => self.increment_x(),
                 "LDA" => self.load_register_a(op_code_params.addressing_mode.clone()),
                 "LDX" => self.load_register_x(op_code_params.addressing_mode.clone()),
                 "LDY" => self.load_register_y(op_code_params.addressing_mode.clone()),
                 "STA" => self.store_register_a(op_code_params.addressing_mode.clone()),
                 "TAX" => self.transfer_a_to_x(),
-                "INX" => self.increment_x(),
                 "BRK" => return,
                 _=> println!("TODO for ${op_code}"), 
             }
@@ -365,6 +366,17 @@ mod cpu_tests {
         assert_eq!(cpu.program_counter, 0x8005);
         assert_eq!(cpu.register_a, 0b0101_0101);
         assert_eq!(cpu.status.0, 0);
+    }
+
+    #[test]
+    pub fn inc_instruction() {
+        let mut cpu = CPU::new();
+        cpu.mem_write_u16(0xFFFC, 0x8000);
+        cpu.mem_write(0x7000, 0xD2);
+        cpu.load_and_run(vec!(0xEE, 0x0, 0x70, 0x00));
+        assert_eq!(cpu.program_counter, 0x8004);
+        assert_eq!(cpu.mem_read(0x7000), 0xD3);
+        assert_eq!(cpu.status.0, 0b1000_0000);
     }
 
     #[test]
