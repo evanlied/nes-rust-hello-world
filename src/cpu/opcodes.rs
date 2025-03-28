@@ -158,6 +158,9 @@ pub static OP_CODE_REF_TABLE: phf::Map<u8, OpCode> = phf_map! {
     0x19u8 => OpCode::new("ORA", 3, 4, AddressingMode::AbsoluteY),
     0x01u8 => OpCode::new("ORA", 2, 6, AddressingMode::IndirectX),
     0x11u8 => OpCode::new("ORA", 2, 5, AddressingMode::IndirectY),
+
+    // PHA
+    0x48u8 => OpCode::new("PHA", 1, 3, AddressingMode::Implied),
  
     // STA
     0x85u8 => OpCode::new("STA", 2, 3, AddressingMode::ZeroPage),

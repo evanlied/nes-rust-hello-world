@@ -27,7 +27,6 @@ impl CPU {
         self.status.set_negative_and_zero_flag(param);
     }
 
-    // TAX
     pub fn transfer_a_to_x(&mut self) {
         self.register_x = self.register_a;
         self.status.set_negative_and_zero_flag(self.register_a);
