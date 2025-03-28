@@ -138,6 +138,13 @@ pub static OP_CODE_REF_TABLE: phf::Map<u8, OpCode> = phf_map! {
     0xB4u8 => OpCode::new("LDY", 2, 4, AddressingMode::ZeroPageX),
     0xACu8 => OpCode::new("LDY", 3, 4, AddressingMode::Absolute),
     0xBCu8 => OpCode::new("LDY", 3, 4, AddressingMode::AbsoluteX),
+
+    // LSR
+    0x4Au8 => OpCode::new("LSR", 1, 2, AddressingMode::Accumulator),
+    0x46u8 => OpCode::new("LSR", 2, 5, AddressingMode::ZeroPage),
+    0x56u8 => OpCode::new("LSR", 2, 6, AddressingMode::ZeroPageX),
+    0x4Eu8 => OpCode::new("LSR", 3, 6, AddressingMode::Absolute),
+    0x5Eu8 => OpCode::new("LSR", 3, 7, AddressingMode::AbsoluteX),
  
     // STA
     0x85u8 => OpCode::new("STA", 2, 3, AddressingMode::ZeroPage),

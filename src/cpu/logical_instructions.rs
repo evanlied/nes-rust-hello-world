@@ -10,7 +10,7 @@ impl CPU {
     }
 
     pub fn bit_test(&mut self, mode: &AddressingMode) {
-        let addr = self.get_operand_address(&mode);
+        let addr = self.get_operand_address(mode);
         let param = self.mem_read(addr);
         let result = param & self.register_a;
 
@@ -20,11 +20,27 @@ impl CPU {
     }
 
     pub fn exclusive_or(&mut self, mode: &AddressingMode) {
-        let addr = self.get_operand_address(&mode);
+        let addr = self.get_operand_address(mode);
         let param = self.mem_read(addr);
         let result = self.register_a ^ param;
         self.register_a = result;
         self.status.set_negative_and_zero_flag(result);
+    }
+
+    pub fn logical_shift_right(&mut self, mode: &AddressingMode) {
+        let (old_val, mem_ptr): (u8, &mut u8) = match mode {
+            AddressingMode::Accumulator => (self.register_a, &mut self.register_a),
+            _ => {
+                let addr = self.get_operand_address(mode);
+                (self.mem_read(addr), &mut self.memory[addr as usize])
+            }
+        };
+        let new_val = old_val >> 1;
+        *mem_ptr = new_val;
+
+        self.status.set_carry_flag(old_val & 0b0000_0001 != 0);
+        self.status.set_zero_flag(new_val);
+        self.status.set_negative_flag(new_val);
     }
 }
 
@@ -82,5 +98,16 @@ mod logical_tests {
         cpu.exclusive_or(&AddressingMode::ZeroPage);
         assert_eq!(cpu.register_a, 0b1001_0110);
         assert_eq!(cpu.status.0, 0b1000_0000);
+    }
+
+    #[test]
+    pub fn logical_shift_right() {
+        let mut cpu = CPU::new();
+        cpu.program_counter = 0x8000;
+        cpu.mem_write(0x80, 0b0101_1111);
+        cpu.mem_write(0x8000, 0x80);
+        cpu.logical_shift_right(&AddressingMode::ZeroPage);
+        assert_eq!(cpu.mem_read(0x80), 0b0010_1111);
+        assert_eq!(cpu.status.0, 0b0000_0001);
     }
 }
