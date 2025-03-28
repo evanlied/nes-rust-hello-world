@@ -45,6 +45,22 @@ impl StatusFlag {
         }
     }
 
+    pub fn set_break_flag_1(&mut self, value: bool) {
+        if value {
+            self.0 = self.0 | 0b0001_0000;
+        } else {
+            self.0 = self.0 & 0b1110_1111;
+        }
+    }
+
+    pub fn set_break_flag_2(&mut self, value: bool) {
+        if value {
+            self.0 = self.0 | 0b0010_0000;
+        } else {
+            self.0 = self.0 & 0b1101_1111;
+        }
+    }
+
     pub fn set_overflow_flag(&mut self, value: u8) {
         // TODO might need to change the set conditions at a later point
         if value & 0b0100_0000 != 0 {

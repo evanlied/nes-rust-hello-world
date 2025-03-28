@@ -161,6 +161,9 @@ pub static OP_CODE_REF_TABLE: phf::Map<u8, OpCode> = phf_map! {
 
     // PHA
     0x48u8 => OpCode::new("PHA", 1, 3, AddressingMode::Implied),
+
+    // PHP
+    0x08u8 => OpCode::new("PHP", 1, 4, AddressingMode::Implied),
  
     // STA
     0x85u8 => OpCode::new("STA", 2, 3, AddressingMode::ZeroPage),

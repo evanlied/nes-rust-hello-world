@@ -34,6 +34,13 @@ impl CPU {
         let lo_bits = self.pop_stack();
         u16::from_le_bytes([lo_bits, hi_bits])
     }
+
+    pub fn push_processor_status(&mut self) {
+        let status = self.status.clone();
+        self.push_stack(status);
+        self.status.set_break_flag_1(false);
+        self.status.set_break_flag_2(true);
+    }
 }
 
 #[cfg(test)]
@@ -80,4 +87,6 @@ mod stack_controller_test {
         assert_eq!(cpu.pop_stack_u16(), 0xABCD);
         assert_eq!(cpu.stack_pointer, MIN_STACK);
     }
+
+    // push processor status to be done in mod.rs
 }

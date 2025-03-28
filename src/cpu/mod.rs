@@ -113,6 +113,7 @@ impl CPU {
                 "NOP" => (),
                 "ORA" => self.inclusive_or(&op_code_params.addressing_mode),
                 "PHA" => self.push_stack(self.register_a),
+                "PHP" => self.push_processor_status(),
                 "STA" => self.store_register_a(&op_code_params.addressing_mode),
                 "TAX" => self.transfer_a_to_x(),
                 "RTS" => self.return_subroutine(),
@@ -485,6 +486,16 @@ mod cpu_tests {
         cpu.load_and_run(vec!(0xA9, 0xFA, 0x48, 0x00));
         assert_eq!(cpu.program_counter, 0x8004);
         assert_eq!(cpu.mem_read(0x100), 0xFA);
+    }
+
+    #[test]
+    pub fn php_instruction() {
+        let mut cpu = CPU::new();
+        cpu.mem_write_u16(0xFFFC, 0x8000);
+        cpu.load_and_run(vec!(0xA9, 0xFF, 0x08, 0x0));
+        assert_eq!(cpu.program_counter, 0x8004);
+        assert_eq!(cpu.status.0, 0b1010_0000);
+        assert_eq!(cpu.mem_read(0x100), 0b1000_0000);
     }
 
     // ------------------------------------------------------------
