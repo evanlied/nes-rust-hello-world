@@ -111,6 +111,7 @@ impl CPU {
                 "LDY" => self.load_register_y(&op_code_params.addressing_mode),
                 "LSR" => self.logical_shift_right(&op_code_params.addressing_mode),
                 "NOP" => (),
+                "ORA" => self.inclusive_or(&op_code_params.addressing_mode),
                 "STA" => self.store_register_a(&op_code_params.addressing_mode),
                 "TAX" => self.transfer_a_to_x(),
                 "RTS" => self.return_subroutine(),
@@ -464,6 +465,16 @@ mod cpu_tests {
         cpu.mem_write_u16(0xFFFC, 0x8000);
         cpu.load_and_run(vec!(0xEA, 0xEA, 0x00));
         assert_eq!(cpu.program_counter, 0x8003);
+    }
+
+    #[test]
+    pub fn ora_instruction() {
+        let mut cpu = CPU::new();
+        cpu.mem_write_u16(0xFFFC, 0x8000);
+        cpu.load_and_run(vec!(0xA9, 0b1000_0001, 0x09, 0b0001_1000, 0x00));
+        assert_eq!(cpu.program_counter, 0x8005);
+        assert_eq!(cpu.register_a, 0b1001_1001);
+        assert_eq!(cpu.status.0, 0b1000_0000);
     }
 
     // ------------------------------------------------------------

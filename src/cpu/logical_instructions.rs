@@ -27,6 +27,13 @@ impl CPU {
         self.status.set_negative_and_zero_flag(result);
     }
 
+    pub fn inclusive_or(&mut self, mode: &AddressingMode) {
+        let addr = self.get_operand_address(mode);
+        let param = self.mem_read(addr);
+        self.register_a = self.register_a | param;
+        self.status.set_negative_and_zero_flag(self.register_a);
+    }
+
     pub fn logical_shift_right(&mut self, mode: &AddressingMode) {
         let (old_val, mem_ptr): (u8, &mut u8) = match mode {
             AddressingMode::Accumulator => (self.register_a, &mut self.register_a),
@@ -97,6 +104,17 @@ mod logical_tests {
         cpu.mem_write(0xAB, 0b0000_1111);
         cpu.exclusive_or(&AddressingMode::ZeroPage);
         assert_eq!(cpu.register_a, 0b1001_0110);
+        assert_eq!(cpu.status.0, 0b1000_0000);
+    }
+
+    #[test]
+    pub fn  inclusive_or_test() {
+        let mut cpu = CPU::new();
+        cpu.register_a = 0b1010_0011;
+        cpu.program_counter = 0x8000;
+        cpu.mem_write(0x8000, 0b1001_0001);
+        cpu.inclusive_or(&AddressingMode::Immediate);
+        assert_eq!(cpu.register_a, 0b1011_0011);
         assert_eq!(cpu.status.0, 0b1000_0000);
     }
 
