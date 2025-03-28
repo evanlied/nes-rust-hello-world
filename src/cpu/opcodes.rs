@@ -145,6 +145,9 @@ pub static OP_CODE_REF_TABLE: phf::Map<u8, OpCode> = phf_map! {
     0x56u8 => OpCode::new("LSR", 2, 6, AddressingMode::ZeroPageX),
     0x4Eu8 => OpCode::new("LSR", 3, 6, AddressingMode::Absolute),
     0x5Eu8 => OpCode::new("LSR", 3, 7, AddressingMode::AbsoluteX),
+
+    // NOP
+    0xEAu8 => OpCode::new("NOP", 1, 2, AddressingMode::Implied),
  
     // STA
     0x85u8 => OpCode::new("STA", 2, 3, AddressingMode::ZeroPage),
