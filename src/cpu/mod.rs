@@ -4,6 +4,7 @@ mod branching_instructions;
 mod arithmetic_instructions;
 mod logical_instructions;
 mod addressing_modes;
+mod stack;
 mod status_flags;
 mod opcodes;
 
@@ -16,6 +17,7 @@ pub struct CPU {
     pub register_y: u8,
     pub status: StatusFlag,
     pub program_counter: u16,
+    stack_pointer: u16,
     memory: [u8; 0xFFFF],
 
     // The JMP Indirect instruction has a bug where fetches on addrress 0xXXFF would return the MSB from
@@ -31,6 +33,7 @@ impl CPU {
             register_y: 0,
             status: StatusFlag(0),
             program_counter: 0,
+            stack_pointer: 0x0100,
             memory: [0; 0xFFFF],
             indirect_bug_enabled: false,
         }
