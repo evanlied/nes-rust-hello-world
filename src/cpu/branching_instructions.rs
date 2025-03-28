@@ -1,4 +1,4 @@
-use super::CPU;
+use super::{addressing_modes::AddressingMode, CPU};
 
 impl CPU {
     // Branch instructions return a bool to let the main body know whether to skip consuming or current PC or not
@@ -48,6 +48,11 @@ impl CPU {
             .wrapping_add(1) // Consumes the current program counter. Make sure not to increment in main cpu cycle body
             .wrapping_add(displacement as u16); // casting to u16 will retain the binary value even when adding
         true
+    }
+
+    pub fn jump(&mut self, mode: &AddressingMode) {
+        let addr = self.get_operand_address(mode);
+        self.program_counter = addr;
     }
 }
 
@@ -174,4 +179,6 @@ mod branching_tests {
         cpu.branch_if_overflow_set();
         assert_eq!(cpu.program_counter, 0x7FFE);
     }
+
+    // Jump test covered in the the main mod file instead
 }

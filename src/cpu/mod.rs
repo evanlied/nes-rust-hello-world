@@ -17,6 +17,10 @@ pub struct CPU {
     pub status: StatusFlag,
     pub program_counter: u16,
     memory: [u8; 0xFFFF],
+
+    // The JMP Indirect instruction has a bug where fetches on addrress 0xXXFF would return the MSB from
+    // 0xXX00 instead of (0xXXFF + 1) (ie XX + 1). For example AAFF would have MSB at AA00 instead of AB00.
+    indirect_bug_enabled: bool,
 }
 
 impl CPU {
@@ -28,6 +32,7 @@ impl CPU {
             status: StatusFlag(0),
             program_counter: 0,
             memory: [0; 0xFFFF],
+            indirect_bug_enabled: false,
         }
     }
 
@@ -47,7 +52,7 @@ impl CPU {
 
     fn mem_read_u16(&self, addr: u16) -> u16 {
         let lo = self.mem_read(addr);
-        let hi = self.mem_read(addr + 1);
+        let hi = self.mem_read(addr.wrapping_add(1));
         u16::from_le_bytes([lo, hi])
     }
 
@@ -55,7 +60,7 @@ impl CPU {
         let lo = (data & 0x00FF) as u8;
         let hi = (data >> 8) as u8;
         self.mem_write(addr, lo);
-        self.mem_write(addr + 1, hi);
+        self.mem_write(addr.wrapping_add(1), hi);
     }
 
     pub fn run(&mut self) {
@@ -90,6 +95,10 @@ impl CPU {
                 "INC" => self.increment_mem(&op_code_params.addressing_mode),
                 "INX" => self.increment_x(),
                 "INY" => self.increment_y(),
+                "JMP" => {
+                    self.jump(&op_code_params.addressing_mode);
+                    continue;
+                },
                 "LDA" => self.load_register_a(&op_code_params.addressing_mode),
                 "LDX" => self.load_register_x(&op_code_params.addressing_mode),
                 "LDY" => self.load_register_y(&op_code_params.addressing_mode),
@@ -408,6 +417,15 @@ mod cpu_tests {
         assert_eq!(cpu.program_counter, 0x8003);
         assert_eq!(cpu.register_y, 0x32);
         assert_eq!(cpu.status.0, 0);
+    }
+
+    #[test]
+    pub fn jmp_instruction() {
+        let mut cpu = CPU::new();
+        cpu.mem_write_u16(0xFFFC, 0x8000);
+        cpu.mem_write_u16(0x7000, 0xABCD);
+        cpu.load_and_run(vec!(0x4C, 0x05, 0x80, 0x00, 0x00, 0x6C, 0x00, 0x70, 0x00));
+        assert_eq!(cpu.program_counter, 0xABCE);
     }
 
     // ------------------------------------------------------------

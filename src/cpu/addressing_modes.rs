@@ -10,6 +10,7 @@ pub enum AddressingMode {
     Absolute,
     AbsoluteX,
     AbsoluteY,
+    Indirect,
     IndirectX,
     IndirectY,
     Implied,
@@ -27,6 +28,18 @@ impl CPU {
             AddressingMode::Absolute => self.mem_read_u16(self.program_counter),
             AddressingMode::AbsoluteX => self.mem_read_u16(self.program_counter).wrapping_add(self.register_x as u16),
             AddressingMode::AbsoluteY => self.mem_read_u16(self.program_counter).wrapping_add(self.register_y as u16),
+            AddressingMode::Indirect => {
+                let ptr = self.mem_read_u16(self.program_counter);
+                match self.indirect_bug_enabled && (ptr & 0xFF == 0xFF ) {
+                    true => {
+                        let bugged_ptr = ptr & 0xFF00;
+                        let lo = self.mem_read(ptr);
+                        let hi = self.mem_read(bugged_ptr);
+                        u16::from_le_bytes([lo, hi])
+                    },
+                    false => self.mem_read_u16(ptr)
+                }
+            },
             AddressingMode::IndirectX => {
                 let base = self.mem_read(self.program_counter) as u8;
                 let ptr = base.wrapping_add(self.register_x);
@@ -147,6 +160,26 @@ mod test_addressing_modes {
         cpu.register_x = 0x06;
         cpu.register_y = 0x05;
         assert_eq!(cpu.get_operand_address(&AddressingMode::IndirectY), 0x0C12);
+    }
+
+    #[test]
+    pub fn indirect_bug_disabled() {
+        let mut cpu = CPU::new();
+        cpu.program_counter = 0x8000;
+        cpu.mem_write_u16(0x8000, 0x11FF);
+        cpu.mem_write_u16(0x11FF, 0xABAB);
+        assert_eq!(cpu.get_operand_address(&AddressingMode::Indirect), 0xABAB);
+    }
+
+    #[test]
+    pub fn indirect_bug_enabled() {
+        let mut cpu = CPU::new();
+        cpu.indirect_bug_enabled = true;
+        cpu.program_counter = 0x8000;
+        cpu.mem_write_u16(0x8000, 0x11FF);
+        cpu.mem_write(0x11FF, 0xCD);
+        cpu.mem_write(0x1100, 0xAB);
+        assert_eq!(cpu.get_operand_address(&AddressingMode::Indirect), 0xABCD);
     }
 
     #[test]
