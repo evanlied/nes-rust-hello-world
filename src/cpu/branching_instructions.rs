@@ -54,6 +54,17 @@ impl CPU {
         let addr = self.get_operand_address(mode);
         self.program_counter = addr;
     }
+
+    pub fn jump_subroutine(&mut self) {
+        let jmp_target = self.get_operand_address(&AddressingMode::Absolute);
+        self.push_stack_u16(self.program_counter + 2 - 1);
+        self.program_counter = jmp_target;
+    }
+
+    pub fn return_subroutine(&mut self) {
+        let jmp_target = self.pop_stack_u16();
+        self.program_counter = jmp_target.wrapping_add(1);
+    }
 }
 
 #[cfg(test)]
@@ -181,4 +192,5 @@ mod branching_tests {
     }
 
     // Jump test covered in the the main mod file instead
+    // Jump_subroutine test covered in the main mod file instead
 }

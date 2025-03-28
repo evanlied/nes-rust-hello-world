@@ -112,6 +112,9 @@ pub static OP_CODE_REF_TABLE: phf::Map<u8, OpCode> = phf_map! {
     0x4Cu8 => OpCode::new("JMP", 3, 3, AddressingMode::Absolute),
     0x6Cu8 => OpCode::new("JMP", 3, 5, AddressingMode::Indirect),
 
+    // JSR
+    0x20u8 => OpCode::new("JSR", 3, 6, AddressingMode::Absolute),
+
     // LDA
     0xA9u8 => OpCode::new("LDA", 2, 2, AddressingMode::Immediate),
     0xA5u8 => OpCode::new("LDA", 2, 3, AddressingMode::ZeroPage),
@@ -147,6 +150,9 @@ pub static OP_CODE_REF_TABLE: phf::Map<u8, OpCode> = phf_map! {
 
     // TAX
     0xAAu8 => OpCode::new("TAX", 1, 2, AddressingMode::Implied),
+
+    // RTS
+    0x60u8 => OpCode::new("RTS", 1, 6, AddressingMode::Implied),
 
     // BRK
     0x00u8 => OpCode::new("BRK", 1, 7, AddressingMode::Implied),

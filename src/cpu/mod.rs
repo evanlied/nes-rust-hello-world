@@ -102,11 +102,16 @@ impl CPU {
                     self.jump(&op_code_params.addressing_mode);
                     continue;
                 },
+                "JSR" => {
+                    self.jump_subroutine();
+                    continue;
+                },
                 "LDA" => self.load_register_a(&op_code_params.addressing_mode),
                 "LDX" => self.load_register_x(&op_code_params.addressing_mode),
                 "LDY" => self.load_register_y(&op_code_params.addressing_mode),
                 "STA" => self.store_register_a(&op_code_params.addressing_mode),
                 "TAX" => self.transfer_a_to_x(),
+                "RTS" => self.return_subroutine(),
                 "BRK" => return,
                 _=> println!("TODO for ${op_code}"), 
             }
@@ -429,6 +434,16 @@ mod cpu_tests {
         cpu.mem_write_u16(0x7000, 0xABCD);
         cpu.load_and_run(vec!(0x4C, 0x05, 0x80, 0x00, 0x00, 0x6C, 0x00, 0x70, 0x00));
         assert_eq!(cpu.program_counter, 0xABCE);
+    }
+
+    #[test]
+    pub fn jsr_rts_instructions() {
+        let mut cpu = CPU::new();
+        cpu.mem_write_u16(0xFFFC, 0x8000);
+        cpu.load_and_run(vec!(0x20, 0x06, 0x80, 0xA2, 0x69, 0x00, 0xA0, 0xDC, 0x60, 0x0));
+        assert_eq!(cpu.program_counter, 0x8006);
+        assert_eq!(cpu.register_x, 0x69);
+        assert_eq!(cpu.register_y, 0xDC);
     }
 
     // ------------------------------------------------------------
