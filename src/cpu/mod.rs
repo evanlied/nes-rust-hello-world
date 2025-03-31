@@ -122,7 +122,8 @@ impl CPU {
                 "RTI" => {
                     self.return_from_interrupt();
                     continue;
-                }
+                },
+                "SBC" => self.subtract_with_carry(&op_code_params.addressing_mode),
                 "STA" => self.store_register_a(&op_code_params.addressing_mode),
                 "TAX" => self.transfer_a_to_x(),
                 "RTS" => self.return_subroutine(),
@@ -542,6 +543,17 @@ mod cpu_tests {
         cpu.run();
         assert_eq!(cpu.program_counter, 0x8051);
         assert_eq!(cpu.status.0, 0b1010_0010);
+        assert_eq!(cpu.stack_pointer, 0x100);
+    }
+
+    #[test]
+    pub fn sbc_instruction() {
+        let mut cpu = CPU::new();
+        cpu.mem_write_u16(0xFFFC, 0x8000);
+        cpu.load_and_run(vec!(0xA9, 0, 0xE9, 10, 0x0));
+        assert_eq!(cpu.program_counter, 0x8005);
+        assert_eq!(cpu.status.0, 0b1000_0000);
+        assert_eq!(cpu.register_a, 246);
     }
 
     // ------------------------------------------------------------

@@ -197,6 +197,16 @@ pub static OP_CODE_REF_TABLE: phf::Map<u8, OpCode> = phf_map! {
 
     // RTI
     0x40u8 => OpCode::new("RTI", 1, 6, AddressingMode::Implied),
+
+    // SBC
+    0xE9u8 => OpCode::new("SBC", 2, 2, AddressingMode::Immediate),
+    0xE5u8 => OpCode::new("SBC", 2, 3, AddressingMode::ZeroPage),
+    0xF5u8 => OpCode::new("SBC", 2, 4, AddressingMode::ZeroPageX),
+    0xEDu8 => OpCode::new("SBC", 3, 4, AddressingMode::Absolute),
+    0xFDu8 => OpCode::new("SBC", 3, 4, AddressingMode::AbsoluteX),
+    0xF9u8 => OpCode::new("SBC", 3, 4, AddressingMode::AbsoluteY),
+    0xE1u8 => OpCode::new("SBC", 2, 6, AddressingMode::IndirectX),
+    0xF1u8 => OpCode::new("SBC", 2, 5, AddressingMode::IndirectY),
  
     // STA
     0x85u8 => OpCode::new("STA", 2, 3, AddressingMode::ZeroPage),

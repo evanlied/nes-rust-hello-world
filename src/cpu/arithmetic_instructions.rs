@@ -13,6 +13,19 @@ impl CPU {
         self.status.set_negative_and_zero_flag(normalized_result);
     }
 
+    pub fn subtract_with_carry(&mut self, mode: &AddressingMode) {
+        let addr = self.get_operand_address(mode);
+        let param = self.mem_read(addr);
+        let carry = if self.status.is_carry_set() { 1 } else { 0 };
+        let result: u16 = (self.register_a.wrapping_add(carry) as u16) 
+            + ((param as i8).wrapping_neg() as u8) as u16;
+        let normalized_result = (result % 256) as u8;
+
+        self.register_a = normalized_result;
+        self.status.set_carry_flag(result > 255);
+        self.status.set_negative_and_zero_flag(normalized_result);
+    }
+
     pub fn increment_x(&mut self) {
         self.register_x = self.register_x.wrapping_add(1);
         self.status.set_negative_and_zero_flag(self.register_x);
@@ -114,6 +127,24 @@ mod arithmetic_test {
         cpu.add_with_carry(&AddressingMode::Immediate);
         assert_eq!(cpu.register_a, 0);
         assert_eq!(cpu.status.0, 0b000_0011);
+    }
+
+    #[test]
+    pub fn subtract_with_cary() {
+        let mut cpu = CPU::new();
+        cpu.register_a = 5;
+        cpu.program_counter = 0x8000;
+        cpu.mem_write(0x8000, 10);
+        cpu.subtract_with_carry(&AddressingMode::Immediate);
+        assert_eq!(cpu.register_a, 251);
+        assert_eq!(cpu.status.0, 0b1000_0000);
+
+        cpu.register_a = (125 as i8).wrapping_neg() as u8;
+        println!("{:#8b}", cpu.register_a);
+        cpu.mem_write(0x8000, 10);
+        cpu.subtract_with_carry(&AddressingMode::Immediate);
+        assert_eq!(cpu.register_a, 121);
+        assert_eq!(cpu.status.0, 0b0000_0001);
     }
 
     #[test]
