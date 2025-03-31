@@ -118,6 +118,7 @@ impl CPU {
                 "PLA" => self.pull_accumulator(),
                 "PLP" => self.pull_processor_status(),
                 "ROL" => self.rotate_left(&op_code_params.addressing_mode),
+                "ROR" => self.rotate_right(&op_code_params.addressing_mode),
                 "STA" => self.store_register_a(&op_code_params.addressing_mode),
                 "TAX" => self.transfer_a_to_x(),
                 "RTS" => self.return_subroutine(),
@@ -518,11 +519,11 @@ mod cpu_tests {
     }
 
     #[test]
-    pub fn rol_instruction() {
+    pub fn rol_ror_instruction() {
         let mut cpu = CPU::new();
         cpu.mem_write_u16(0xFFFC, 0x8000);
-        cpu.load_and_run(vec!(0xA9, 0b11000011, 0x2A, 00));
-        assert_eq!(cpu.program_counter, 0x8004);
+        cpu.load_and_run(vec!(0xA9, 0b11000011, 0x2A, 0x2A, 0x6A, 00));
+        assert_eq!(cpu.program_counter, 0x8006);
         assert_eq!(cpu.register_a, 0b1000_0111);
         assert_eq!(cpu.status.0, 0b1000_0001);
     }
