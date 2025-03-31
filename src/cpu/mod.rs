@@ -119,6 +119,10 @@ impl CPU {
                 "PLP" => self.pull_processor_status(),
                 "ROL" => self.rotate_left(&op_code_params.addressing_mode),
                 "ROR" => self.rotate_right(&op_code_params.addressing_mode),
+                "RTI" => {
+                    self.return_from_interrupt();
+                    continue;
+                }
                 "STA" => self.store_register_a(&op_code_params.addressing_mode),
                 "TAX" => self.transfer_a_to_x(),
                 "RTS" => self.return_subroutine(),
@@ -526,6 +530,18 @@ mod cpu_tests {
         assert_eq!(cpu.program_counter, 0x8006);
         assert_eq!(cpu.register_a, 0b1000_0111);
         assert_eq!(cpu.status.0, 0b1000_0001);
+    }
+
+    #[test]
+    pub fn rti_instruction() {
+        let mut cpu = CPU::new();
+        cpu.mem_write_u16(0xFFFC, 0x8000);
+        cpu.push_stack_u16( 0x8050);
+        cpu.push_stack( 0b1000_0010);
+        cpu.load(vec!(0x40));
+        cpu.run();
+        assert_eq!(cpu.program_counter, 0x8051);
+        assert_eq!(cpu.status.0, 0b1010_0010);
     }
 
     // ------------------------------------------------------------

@@ -65,6 +65,11 @@ impl CPU {
         let jmp_target = self.pop_stack_u16();
         self.program_counter = jmp_target.wrapping_add(1);
     }
+
+    pub fn return_from_interrupt(&mut self) {
+        self.pull_processor_status();
+        self.program_counter = self.pop_stack_u16();
+    }
 }
 
 #[cfg(test)]
