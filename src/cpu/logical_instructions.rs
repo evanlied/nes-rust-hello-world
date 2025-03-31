@@ -35,19 +35,22 @@ impl CPU {
     }
 
     pub fn logical_shift_right(&mut self, mode: &AddressingMode) {
-        let (old_val, mem_ptr): (u8, &mut u8) = match mode {
-            AddressingMode::Accumulator => (self.register_a, &mut self.register_a),
-            _ => {
-                let addr = self.get_operand_address(mode);
-                (self.mem_read(addr), &mut self.memory[addr as usize])
-            }
-        };
+        let (old_val, mem_ptr) = self.get_val_and_mem_ptr(mode);
         let new_val = old_val >> 1;
         *mem_ptr = new_val;
 
         self.status.set_carry_flag(old_val & 0b0000_0001 != 0);
         self.status.set_zero_flag(new_val);
         self.status.set_negative_flag(new_val);
+    }
+
+    pub fn rotate_left(&mut self, mode: &AddressingMode) {
+        let (old_val, mem_ptr) = self.get_val_and_mem_ptr(mode);
+        let new_val = old_val.rotate_left(1);
+        *mem_ptr = new_val;
+
+        self.status.set_carry_flag(old_val & 0b1000_0000 != 0);
+        self.status.set_negative_and_zero_flag(new_val);
     }
 }
 

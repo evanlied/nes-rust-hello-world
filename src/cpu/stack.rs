@@ -36,8 +36,14 @@ impl CPU {
     }
 
     pub fn push_processor_status(&mut self) {
-        let status = self.status.clone();
+        let status = self.status.0;
         self.push_stack(status);
+        self.status.set_break_flag_1(false);
+        self.status.set_break_flag_2(true);
+    }
+
+    pub fn pull_processor_status(&mut self) {
+        self.status.0 = self.pop_stack();
         self.status.set_break_flag_1(false);
         self.status.set_break_flag_2(true);
     }

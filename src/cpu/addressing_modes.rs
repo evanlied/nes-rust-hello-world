@@ -57,6 +57,17 @@ impl CPU {
             _ => panic!("Unsupported addressing mode"),
         }
     }
+
+    /** This function is mostly used by shift / rotate operations that can work directly on the accumulator */
+    pub fn get_val_and_mem_ptr(&mut self, mode: &AddressingMode) -> (u8, &mut u8) {
+        match mode {
+            AddressingMode::Accumulator => (self.register_a, &mut self.register_a),
+            _ => {
+                let addr = self.get_operand_address(mode);
+                (self.mem_read(addr), &mut self.memory[addr as usize])
+            }
+        }
+    }
 }
 
 #[cfg(test)]

@@ -70,7 +70,7 @@ impl CPU {
         loop {
             let op_code = self.mem_read(self.program_counter);
             let op_code_params = OP_CODE_REF_TABLE.get(&op_code)
-                .expect(&format!("${op_code} is not a valid operation"));
+                .expect(&format!("${op_code:#x} is not a valid operation"));
             self.program_counter += 1;
             match op_code_params.instruction {
                 "ADC" => self.add_with_carry(&op_code_params.addressing_mode),
@@ -116,11 +116,13 @@ impl CPU {
                 "PHA" => self.push_stack(self.register_a),
                 "PHP" => self.push_processor_status(),
                 "PLA" => self.pull_accumulator(),
+                "PLP" => self.pull_processor_status(),
+                "ROL" => self.rotate_left(&op_code_params.addressing_mode),
                 "STA" => self.store_register_a(&op_code_params.addressing_mode),
                 "TAX" => self.transfer_a_to_x(),
                 "RTS" => self.return_subroutine(),
                 "BRK" => return,
-                _=> println!("TODO for ${op_code}"), 
+                _=> println!("TODO for ${op_code:#x}"), 
             }
             self.program_counter += op_code_params.bytes - 1;
         }
@@ -506,13 +508,23 @@ mod cpu_tests {
     }
 
     #[test]
-    pub fn php_instruction() {
+    pub fn php_plp_instruction() {
         let mut cpu = CPU::new();
         cpu.mem_write_u16(0xFFFC, 0x8000);
-        cpu.load_and_run(vec!(0xA9, 0xFF, 0x08, 0x0));
-        assert_eq!(cpu.program_counter, 0x8004);
+        cpu.load_and_run(vec!(0xA9, 0xFF, 0x08, 0x69, 0x10, 0x28, 0x0));
+        assert_eq!(cpu.program_counter, 0x8007);
         assert_eq!(cpu.status.0, 0b1010_0000);
         assert_eq!(cpu.mem_read(0x100), 0b1000_0000);
+    }
+
+    #[test]
+    pub fn rol_instruction() {
+        let mut cpu = CPU::new();
+        cpu.mem_write_u16(0xFFFC, 0x8000);
+        cpu.load_and_run(vec!(0xA9, 0b11000011, 0x2A, 00));
+        assert_eq!(cpu.program_counter, 0x8004);
+        assert_eq!(cpu.register_a, 0b1000_0111);
+        assert_eq!(cpu.status.0, 0b1000_0001);
     }
 
     // ------------------------------------------------------------

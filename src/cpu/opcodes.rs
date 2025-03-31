@@ -177,6 +177,16 @@ pub static OP_CODE_REF_TABLE: phf::Map<u8, OpCode> = phf_map! {
 
     // PLA
     0x68u8 => OpCode::new("PLA", 1, 4, AddressingMode::Implied),
+
+    // PLP
+    0x28u8 => OpCode::new("PLP", 1, 4, AddressingMode::Implied),
+
+    // ROL
+    0x2Au8 => OpCode::new("ROL", 1, 2, AddressingMode::Accumulator),
+    0x26u8 => OpCode::new("ROL", 2, 5, AddressingMode::ZeroPage),
+    0x36u8 => OpCode::new("ROL", 2, 6, AddressingMode::ZeroPageX),
+    0x2Eu8 => OpCode::new("ROL", 3, 6, AddressingMode::Absolute),
+    0x3Eu8 => OpCode::new("ROL", 3, 7, AddressingMode::AbsoluteX),
  
     // STA
     0x85u8 => OpCode::new("STA", 2, 3, AddressingMode::ZeroPage),
