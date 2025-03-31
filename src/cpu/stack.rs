@@ -41,6 +41,11 @@ impl CPU {
         self.status.set_break_flag_1(false);
         self.status.set_break_flag_2(true);
     }
+
+    pub fn pull_accumulator(&mut self) {
+        self.register_a = self.pop_stack();
+        self.status.set_zero_flag(self.register_a);
+    }
 }
 
 #[cfg(test)]

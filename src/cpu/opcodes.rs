@@ -17,6 +17,16 @@ impl OpCode {
 }
 
 pub static OP_CODE_REF_TABLE: phf::Map<u8, OpCode> = phf_map! {
+    // ADC
+    0x69u8 => OpCode::new("ADC", 2, 2, AddressingMode::Immediate),
+    0x65u8 => OpCode::new("ADC", 2, 3, AddressingMode::ZeroPage),
+    0x75u8 => OpCode::new("ADC", 2, 4, AddressingMode::ZeroPageX),
+    0x6Du8 => OpCode::new("ADC", 3, 4, AddressingMode::Absolute),
+    0x7Du8 => OpCode::new("ADC", 3, 4, AddressingMode::AbsoluteX),
+    0x79u8 => OpCode::new("ADC", 3, 4, AddressingMode::AbsoluteY),
+    0x61u8 => OpCode::new("ADC", 2, 6, AddressingMode::Indirect),
+    0x71u8 => OpCode::new("ADC", 2, 5, AddressingMode::IndirectY),
+
     // AND
     0x29u8 => OpCode::new("AND", 2, 2, AddressingMode::Immediate),
     0x25u8 => OpCode::new("AND", 2, 3, AddressingMode::ZeroPage),
@@ -164,6 +174,9 @@ pub static OP_CODE_REF_TABLE: phf::Map<u8, OpCode> = phf_map! {
 
     // PHP
     0x08u8 => OpCode::new("PHP", 1, 4, AddressingMode::Implied),
+
+    // PLA
+    0x68u8 => OpCode::new("PLA", 1, 4, AddressingMode::Implied),
  
     // STA
     0x85u8 => OpCode::new("STA", 2, 3, AddressingMode::ZeroPage),

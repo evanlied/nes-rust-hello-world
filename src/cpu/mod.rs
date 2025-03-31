@@ -73,6 +73,7 @@ impl CPU {
                 .expect(&format!("${op_code} is not a valid operation"));
             self.program_counter += 1;
             match op_code_params.instruction {
+                "ADC" => self.add_with_carry(&op_code_params.addressing_mode),
                 "AND" => self.and(&op_code_params.addressing_mode),
                 "ASL" => self.arithmetic_shift_left(&op_code_params.addressing_mode),
                 "BCC" => if self.branch_if_carry_clear() { continue; },
@@ -114,6 +115,7 @@ impl CPU {
                 "ORA" => self.inclusive_or(&op_code_params.addressing_mode),
                 "PHA" => self.push_stack(self.register_a),
                 "PHP" => self.push_processor_status(),
+                "PLA" => self.pull_accumulator(),
                 "STA" => self.store_register_a(&op_code_params.addressing_mode),
                 "TAX" => self.transfer_a_to_x(),
                 "RTS" => self.return_subroutine(),
@@ -130,6 +132,7 @@ impl CPU {
         self.register_y = 0;
         self.status = StatusFlag(0);
         self.program_counter = self.mem_read_u16(0xFFFC);
+        self.stack_pointer = 0x100;
     }
 
     pub fn load_and_run(&mut self, program: Vec<u8>) {
@@ -164,6 +167,18 @@ mod cpu_tests {
 
         assert_eq!(cpu.mem_read(0x15), 0x15);
         assert_eq!(cpu.program_counter, 0x8005);
+    }
+
+    #[test]
+    pub fn adc_instruction() {
+        let mut cpu = CPU::new();
+        cpu.mem_write_u16(0xFFFC, 0x8000);
+        cpu.mem_write(0x70, 33);
+        cpu.load_and_run(vec!(0xA9, 120, 0x65, 0x70, 0x0));
+
+        assert_eq!(cpu.program_counter, 0x8005);
+        assert_eq!(cpu.register_a, 153);
+        assert_eq!(cpu.status.0, 0b1000_0000);
     }
 
     #[test]
@@ -480,12 +495,14 @@ mod cpu_tests {
     }
 
     #[test]
-    pub fn pha_instruction() {
+    pub fn pha_pla_instruction() {
         let mut cpu = CPU::new();
         cpu.mem_write_u16(0xFFFC, 0x8000);
-        cpu.load_and_run(vec!(0xA9, 0xFA, 0x48, 0x00));
-        assert_eq!(cpu.program_counter, 0x8004);
-        assert_eq!(cpu.mem_read(0x100), 0xFA);
+        cpu.load_and_run(vec!(0xA9, 0xF0, 0x48, 0x69, 0x5, 0x68, 0x00));
+        assert_eq!(cpu.program_counter, 0x8007);
+        assert_eq!(cpu.mem_read(0x100), 0xF0);
+        assert_eq!(cpu.register_a, 0xF0);
+        assert_eq!(cpu.stack_pointer, 0x100);
     }
 
     #[test]

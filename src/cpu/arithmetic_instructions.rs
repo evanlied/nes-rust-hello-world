@@ -1,6 +1,18 @@
 use super::{addressing_modes::AddressingMode, CPU};
 
 impl CPU {
+    pub fn add_with_carry(&mut self, mode: &AddressingMode) {
+        let addr = self.get_operand_address(mode);
+        let param = self.mem_read(addr);
+        let carry: u16 = if self.status.is_carry_set() { 1 } else { 0 };
+        let result: u16 = (self.register_a as u16) + (param as u16) + carry;
+        let normalized_result = (result % 256) as u8;
+
+        self.register_a = normalized_result;
+        self.status.set_carry_flag(result > 255);
+        self.status.set_negative_and_zero_flag(normalized_result);
+    }
+
     pub fn increment_x(&mut self) {
         self.register_x = self.register_x.wrapping_add(1);
         self.status.set_negative_and_zero_flag(self.register_x);
@@ -80,6 +92,29 @@ impl CPU {
 #[cfg(test)]
 mod arithmetic_test {
     use super::*;
+
+    #[test]
+    pub fn add_with_carry() {
+        let mut cpu = CPU::new();
+        cpu.register_a = 250;
+        cpu.program_counter = 0x8000;
+        cpu.mem_write(0x8000, 10);
+        cpu.add_with_carry(&AddressingMode::Immediate);
+        assert_eq!(cpu.register_a, (250 as u8).wrapping_add(10));
+        assert_eq!(cpu.status.0, 0b0000_0001);
+
+        // Second addition now that carry bit is set will add an additional 1
+        cpu.mem_write(0x8000, 22);
+        cpu.add_with_carry(&AddressingMode::Immediate);
+        assert_eq!(cpu.register_a, 27);
+        assert_eq!(cpu.status.0, 0b0);
+
+        // Third addition to check how zero result is handled
+        cpu.mem_write(0x8000, 229);
+        cpu.add_with_carry(&AddressingMode::Immediate);
+        assert_eq!(cpu.register_a, 0);
+        assert_eq!(cpu.status.0, 0b000_0011);
+    }
 
     #[test]
     pub fn increment_x_test() {
