@@ -207,6 +207,11 @@ pub static OP_CODE_REF_TABLE: phf::Map<u8, OpCode> = phf_map! {
     0xF9u8 => OpCode::new("SBC", 3, 4, AddressingMode::AbsoluteY),
     0xE1u8 => OpCode::new("SBC", 2, 6, AddressingMode::IndirectX),
     0xF1u8 => OpCode::new("SBC", 2, 5, AddressingMode::IndirectY),
+
+    // Flag Setters
+    0x38u8 => OpCode::new("SEC", 1, 2, AddressingMode::Implied),
+    0xF8u8 => OpCode::new("SED", 1, 2, AddressingMode::Implied),
+    0x78u8 => OpCode::new("SEI", 1, 2, AddressingMode::Implied),
  
     // STA
     0x85u8 => OpCode::new("STA", 2, 3, AddressingMode::ZeroPage),

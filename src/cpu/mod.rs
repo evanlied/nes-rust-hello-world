@@ -124,6 +124,9 @@ impl CPU {
                     continue;
                 },
                 "SBC" => self.subtract_with_carry(&op_code_params.addressing_mode),
+                "SEC" => self.set_carry_flag(),
+                "SED" => self.set_decimal_flag(),
+                "SEI" => self.set_interrupt_flag(),
                 "STA" => self.store_register_a(&op_code_params.addressing_mode),
                 "TAX" => self.transfer_a_to_x(),
                 "RTS" => self.return_subroutine(),
@@ -554,6 +557,15 @@ mod cpu_tests {
         assert_eq!(cpu.program_counter, 0x8005);
         assert_eq!(cpu.status.0, 0b1000_0000);
         assert_eq!(cpu.register_a, 246);
+    }
+
+    #[test]
+    pub fn sec_sed_sei_instructions() {
+        let mut cpu = CPU::new();
+        cpu.mem_write_u16(0xFFFC, 0x8000);
+        cpu.load_and_run(vec!(0x38, 0xF8, 0x78, 0x0));
+        assert_eq!(cpu.program_counter, 0x8004);
+        assert_eq!(cpu.status.0, 0b0000_1101);
     }
 
     // ------------------------------------------------------------

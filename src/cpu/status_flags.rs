@@ -1,5 +1,7 @@
 use std::ops::Deref;
 
+use super::CPU;
+
 pub struct StatusFlag(pub u8);
 
 impl Deref for StatusFlag {
@@ -107,6 +109,16 @@ impl StatusFlag {
     pub fn is_negative_set(&self) -> bool {
         self.0 & 0b1000_0000 != 0
     }
+}
+
+impl CPU {
+    pub fn set_carry_flag(&mut self) { self.status.set_carry_flag(true); }
+
+    // Unused for RICOH NES 6502 Chip
+    pub fn set_decimal_flag(&mut self) { self.status.set_decimal_flag(true); }
+
+    pub fn set_interrupt_flag(&mut self) { self.status.set_interrupt_flag(true); }
+
 }
 
 #[cfg(test)]
