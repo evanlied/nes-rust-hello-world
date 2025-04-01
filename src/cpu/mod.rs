@@ -128,6 +128,8 @@ impl CPU {
                 "SED" => self.set_decimal_flag(),
                 "SEI" => self.set_interrupt_flag(),
                 "STA" => self.store_register_a(&op_code_params.addressing_mode),
+                "STX" => self.store_register_x(&op_code_params.addressing_mode),
+                "STY" => self.store_register_y(&op_code_params.addressing_mode),
                 "TAX" => self.transfer_a_to_x(),
                 "RTS" => self.return_subroutine(),
                 "BRK" => return,
@@ -171,13 +173,15 @@ mod cpu_tests {
     }
 
     #[test]
-    pub fn store_instruction() {
+    pub fn sta_stx_sty_instruction() {
         let mut cpu = CPU::new();
         cpu.mem_write_u16(0xFFFC, 0x8000);
-        cpu.load_and_run(vec!(0xA9, 0x15, 0x85, 0x15, 0x00));
+        cpu.load_and_run(vec!(0xA9, 0x25, 0xA2, 0x35, 0xA0, 0x45, 0x85, 0x15, 0x86, 0x25, 0x84, 0x35, 0x00));
 
-        assert_eq!(cpu.mem_read(0x15), 0x15);
-        assert_eq!(cpu.program_counter, 0x8005);
+        assert_eq!(cpu.program_counter, 0x800D);
+        assert_eq!(cpu.mem_read(0x15), 0x25);
+        assert_eq!(cpu.mem_read(0x25), 0x35);
+        assert_eq!(cpu.mem_read(0x35), 0x45);
     }
 
     #[test]

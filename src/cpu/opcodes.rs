@@ -222,6 +222,16 @@ pub static OP_CODE_REF_TABLE: phf::Map<u8, OpCode> = phf_map! {
     0x81u8 => OpCode::new("STA", 2, 6, AddressingMode::IndirectX),
     0x91u8 => OpCode::new("STA", 2, 6, AddressingMode::IndirectY),
 
+    // STX
+    0x86u8 => OpCode::new("STX", 2, 3, AddressingMode::ZeroPage),
+    0x96u8 => OpCode::new("STX", 2, 4, AddressingMode::ZeroPageY),
+    0x8Eu8 => OpCode::new("STX", 3, 4, AddressingMode::Absolute),
+
+    // STY
+    0x84u8 => OpCode::new("STY", 2, 3, AddressingMode::ZeroPage),
+    0x94u8 => OpCode::new("STY", 2, 4, AddressingMode::ZeroPageY),
+    0x8Cu8 => OpCode::new("STY", 3, 4, AddressingMode::Absolute),
+
     // TAX
     0xAAu8 => OpCode::new("TAX", 1, 2, AddressingMode::Implied),
 
