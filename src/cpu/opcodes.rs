@@ -244,8 +244,14 @@ pub static OP_CODE_REF_TABLE: phf::Map<u8, OpCode> = phf_map! {
     // TSX
     0xBAu8 => OpCode::new("TSX", 1, 2, AddressingMode::Implied),
 
+    // TXA
+    0x8Au8 => OpCode::new("TXA", 1, 2, AddressingMode::Implied),
+
     // TXS
     0x9au8 => OpCode::new("TXS", 1, 2, AddressingMode::Implied),
+
+    // TYA
+    0x98u8 => OpCode::new("TYA", 1, 2, AddressingMode::Implied),
 
     // BRK
     0x00u8 => OpCode::new("BRK", 1, 7, AddressingMode::Implied),

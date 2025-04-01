@@ -133,7 +133,9 @@ impl CPU {
                 "TAX" => self.transfer_a_to_x(),
                 "TAY" => self.transfer_a_to_y(),
                 "TSX" => self.transfer_stack_pointer_to_x(),
+                "TXA" => self.transfer_x_to_a(),
                 "TXS" => self.transfer_x_to_stack_pointer(),
+                "TYA" => self.transfer_y_to_a(),
                 "RTS" => self.return_subroutine(),
                 "BRK" => return,
                 _=> println!("TODO for ${op_code:#x}"), 
@@ -596,6 +598,28 @@ mod cpu_tests {
         assert_eq!(cpu.status.0, 0b1000_0000);
         assert_eq!(cpu.register_x, 200);
         assert_eq!(cpu.stack_pointer, 200);
+    }
+
+    #[test]
+    pub fn txa_instruction() {
+        let mut cpu = CPU::new();
+        cpu.mem_write_u16(0xFFFC, 0x8000);
+        cpu.load_and_run(vec!(0xA2, 0xFF, 0x8A, 0x00));
+        assert_eq!(cpu.program_counter, 0x8004);
+        assert_eq!(cpu.status.0, 0b1000_0000);
+        assert_eq!(cpu.register_x, 0xFF);
+        assert_eq!(cpu.register_a, 0xFF);
+    }
+
+    #[test]
+    pub fn tya_instruction() {
+        let mut cpu = CPU::new();
+        cpu.mem_write_u16(0xFFFC, 0x8000);
+        cpu.load_and_run(vec!(0xA0, 0xFF, 0x98, 0x00));
+        assert_eq!(cpu.program_counter, 0x8004);
+        assert_eq!(cpu.status.0, 0b1000_0000);
+        assert_eq!(cpu.register_y, 0xFF);
+        assert_eq!(cpu.register_a, 0xFF);
     }
 
     // ------------------------------------------------------------
