@@ -17,7 +17,7 @@ pub struct CPU {
     pub register_y: u8,
     pub status: StatusFlag,
     pub program_counter: u16,
-    stack_pointer: u16,
+    stack_pointer: u8,
     memory: [u8; 0xFFFF],
 
     // The JMP Indirect instruction has a bug where fetches on addrress 0xXXFF would return the MSB from
@@ -33,7 +33,7 @@ impl CPU {
             register_y: 0,
             status: StatusFlag(0),
             program_counter: 0,
-            stack_pointer: 0x0100,
+            stack_pointer: 0,
             memory: [0; 0xFFFF],
             indirect_bug_enabled: false,
         }
@@ -131,6 +131,7 @@ impl CPU {
                 "STX" => self.store_register_x(&op_code_params.addressing_mode),
                 "STY" => self.store_register_y(&op_code_params.addressing_mode),
                 "TAX" => self.transfer_a_to_x(),
+                "TAY" => self.transfer_a_to_y(),
                 "RTS" => self.return_subroutine(),
                 "BRK" => return,
                 _=> println!("TODO for ${op_code:#x}"), 
@@ -145,7 +146,7 @@ impl CPU {
         self.register_y = 0;
         self.status = StatusFlag(0);
         self.program_counter = self.mem_read_u16(0xFFFC);
-        self.stack_pointer = 0x100;
+        self.stack_pointer = 0x0;
     }
 
     pub fn load_and_run(&mut self, program: Vec<u8>) {
@@ -517,7 +518,7 @@ mod cpu_tests {
         assert_eq!(cpu.program_counter, 0x8007);
         assert_eq!(cpu.mem_read(0x100), 0xF0);
         assert_eq!(cpu.register_a, 0xF0);
-        assert_eq!(cpu.stack_pointer, 0x100);
+        assert_eq!(cpu.stack_pointer, 0x0);
     }
 
     #[test]
@@ -550,7 +551,7 @@ mod cpu_tests {
         cpu.run();
         assert_eq!(cpu.program_counter, 0x8051);
         assert_eq!(cpu.status.0, 0b1010_0010);
-        assert_eq!(cpu.stack_pointer, 0x100);
+        assert_eq!(cpu.stack_pointer, 0x0);
     }
 
     #[test]
@@ -570,6 +571,18 @@ mod cpu_tests {
         cpu.load_and_run(vec!(0x38, 0xF8, 0x78, 0x0));
         assert_eq!(cpu.program_counter, 0x8004);
         assert_eq!(cpu.status.0, 0b0000_1101);
+    }
+
+    #[test]
+    pub fn tax_tay_instructions() {
+        let mut cpu = CPU::new();
+        cpu.mem_write_u16(0xFFFC, 0x8000);
+        cpu.load_and_run(vec!(0xA9, 200, 0xAA, 0xA8, 0x0));
+        assert_eq!(cpu.program_counter, 0x8005);
+        assert_eq!(cpu.status.0, 0b1000_0000);
+        assert_eq!(cpu.register_a, 200);
+        assert_eq!(cpu.register_x, 200);
+        assert_eq!(cpu.register_y, 200);
     }
 
     // ------------------------------------------------------------

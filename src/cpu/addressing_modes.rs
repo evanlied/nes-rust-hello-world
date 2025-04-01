@@ -1,6 +1,6 @@
 use super::CPU;
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub enum AddressingMode {
     Immediate,
     Accumulator,
@@ -15,7 +15,6 @@ pub enum AddressingMode {
     IndirectY,
     Implied,
     Relative,
-    NoneAddressing,
 }
 
 impl CPU {
@@ -54,7 +53,7 @@ impl CPU {
                 let hi = self.mem_read(ptr.wrapping_add(1) as u16);
                 u16::from_le_bytes([lo, hi])
             },
-            _ => panic!("Unsupported addressing mode"),
+            _ => panic!("Can't get addr for addressing mode {:?}", mode),
         }
     }
 
@@ -191,12 +190,5 @@ mod test_addressing_modes {
         cpu.mem_write(0x11FF, 0xCD);
         cpu.mem_write(0x1100, 0xAB);
         assert_eq!(cpu.get_operand_address(&AddressingMode::Indirect), 0xABCD);
-    }
-
-    #[test]
-    #[should_panic]
-    pub fn none_addr() {
-        let cpu = CPU::new();
-        cpu.get_operand_address(&AddressingMode::NoneAddressing);
     }
 }

@@ -31,6 +31,16 @@ impl CPU {
         self.register_x = self.register_a;
         self.status.set_negative_and_zero_flag(self.register_a);
     }
+
+    pub fn transfer_a_to_y(&mut self) {
+        self.register_y = self.register_a;
+        self.status.set_negative_and_zero_flag(self.register_a);
+    }
+
+    pub fn transfer_stack_pointer_to_x(&mut self) {
+        self.register_x = self.stack_pointer;
+        self.status.set_negative_and_zero_flag(self.register_x);
+    }
 }
 
 #[cfg(test)]

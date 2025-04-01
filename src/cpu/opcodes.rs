@@ -235,6 +235,9 @@ pub static OP_CODE_REF_TABLE: phf::Map<u8, OpCode> = phf_map! {
     // TAX
     0xAAu8 => OpCode::new("TAX", 1, 2, AddressingMode::Implied),
 
+    // TAY
+    0xA8u8 => OpCode::new("TAY", 1, 2, AddressingMode::Implied),
+
     // RTS
     0x60u8 => OpCode::new("RTS", 1, 6, AddressingMode::Implied),
 

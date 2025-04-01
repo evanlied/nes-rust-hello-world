@@ -6,11 +6,9 @@ const MIN_STACK: u16 = 0x0100;
 // Methods that deal with manipulating the stack memory located at 0x0100-0x01FF
 impl CPU {
     pub fn push_stack(&mut self, new_val: u8) {
-        if self.stack_pointer > MAX_STACK {
-            panic!("Stack out of memory");
-        }
-        self.mem_write(self.stack_pointer, new_val);
-        self.stack_pointer += 1;
+        let stack_addr = MIN_STACK + self.stack_pointer as u16;
+        self.mem_write(stack_addr, new_val);
+        self.stack_pointer = self.stack_pointer.wrapping_add(1);
     }
 
     pub fn push_stack_u16(&mut self, new_val: u16) {
@@ -21,11 +19,9 @@ impl CPU {
     }
 
     pub fn pop_stack(&mut self) -> u8 {
-        if self.stack_pointer <= MIN_STACK {
-            panic!("Stack is empty");
-        }
-        self.stack_pointer -= 1;
-        let val = self.mem_read(self.stack_pointer);
+        self.stack_pointer = self.stack_pointer.wrapping_sub(1);
+        let stack_addr = MIN_STACK + self.stack_pointer as u16;
+        let val = self.mem_read(stack_addr);
         return val;
     }
 
@@ -59,44 +55,37 @@ mod stack_controller_test {
     use super::*;
 
     #[test]
-    #[should_panic]
     pub fn push_pop_upper_limit() {
         let mut cpu = CPU::new();
-        cpu.stack_pointer = MAX_STACK;
+        cpu.stack_pointer = 0xFF;
         cpu.push_stack(0xAB);
         assert_eq!(cpu.mem_read(MAX_STACK), 0xAB);
-        assert_eq!(cpu.stack_pointer, MAX_STACK + 1);
+        assert_eq!(cpu.stack_pointer, 0x0);
 
         assert_eq!(cpu.pop_stack(), 0xAB);
-        assert_eq!(cpu.stack_pointer, MAX_STACK);
-
-        cpu.push_stack(0xAB);
-        cpu.push_stack(0xCD);
+        assert_eq!(cpu.stack_pointer, 0xFF);
     }
 
     #[test]
-    #[should_panic]
     pub fn push_pop_lower_limit() {
         let mut cpu = CPU::new();
         cpu.push_stack(0xAB);
         assert_eq!(cpu.mem_read(MIN_STACK), 0xAB);
-        assert_eq!(cpu.stack_pointer, MIN_STACK + 1);
+        assert_eq!(cpu.stack_pointer, 0x1);
 
         assert_eq!(cpu.pop_stack(), 0xAB);
-        assert_eq!(cpu.stack_pointer, MIN_STACK);
-
-        cpu.pop_stack();
+        assert_eq!(cpu.stack_pointer, 0x0);
     }
 
     #[test]
     pub fn push_pop_u16() {
         let mut cpu = CPU::new();
         cpu.push_stack_u16(0xABCD);
-        assert_eq!(cpu.stack_pointer, MIN_STACK + 2);
+        assert_eq!(cpu.stack_pointer, 0x2);
         assert_eq!(cpu.mem_read_u16(MIN_STACK), 0xABCD);
 
         assert_eq!(cpu.pop_stack_u16(), 0xABCD);
-        assert_eq!(cpu.stack_pointer, MIN_STACK);
+        assert_eq!(cpu.stack_pointer, 0x0);
     }
 
     // push processor status to be done in mod.rs
