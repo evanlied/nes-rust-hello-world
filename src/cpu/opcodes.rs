@@ -198,6 +198,9 @@ pub static OP_CODE_REF_TABLE: phf::Map<u8, OpCode> = phf_map! {
     // RTI
     0x40u8 => OpCode::new("RTI", 1, 6, AddressingMode::Implied),
 
+    // RTS
+    0x60u8 => OpCode::new("RTS", 1, 6, AddressingMode::Implied),
+
     // SBC
     0xE9u8 => OpCode::new("SBC", 2, 2, AddressingMode::Immediate),
     0xE5u8 => OpCode::new("SBC", 2, 3, AddressingMode::ZeroPage),
@@ -238,8 +241,11 @@ pub static OP_CODE_REF_TABLE: phf::Map<u8, OpCode> = phf_map! {
     // TAY
     0xA8u8 => OpCode::new("TAY", 1, 2, AddressingMode::Implied),
 
-    // RTS
-    0x60u8 => OpCode::new("RTS", 1, 6, AddressingMode::Implied),
+    // TSX
+    0xBAu8 => OpCode::new("TSX", 1, 2, AddressingMode::Implied),
+
+    // TXS
+    0x9au8 => OpCode::new("TXS", 1, 2, AddressingMode::Implied),
 
     // BRK
     0x00u8 => OpCode::new("BRK", 1, 7, AddressingMode::Implied),

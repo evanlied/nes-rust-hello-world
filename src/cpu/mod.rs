@@ -132,6 +132,8 @@ impl CPU {
                 "STY" => self.store_register_y(&op_code_params.addressing_mode),
                 "TAX" => self.transfer_a_to_x(),
                 "TAY" => self.transfer_a_to_y(),
+                "TSX" => self.transfer_stack_pointer_to_x(),
+                "TXS" => self.transfer_x_to_stack_pointer(),
                 "RTS" => self.return_subroutine(),
                 "BRK" => return,
                 _=> println!("TODO for ${op_code:#x}"), 
@@ -583,6 +585,17 @@ mod cpu_tests {
         assert_eq!(cpu.register_a, 200);
         assert_eq!(cpu.register_x, 200);
         assert_eq!(cpu.register_y, 200);
+    }
+
+    #[test]
+    pub fn tsx_txs_instructions() {
+        let mut cpu = CPU::new();
+        cpu.mem_write_u16(0xFFFC, 0x8000);
+        cpu.load_and_run(vec!(0xA2, 200, 0x9A, 0xE8, 0xBA, 0x0));
+        assert_eq!(cpu.program_counter, 0x8006);
+        assert_eq!(cpu.status.0, 0b1000_0000);
+        assert_eq!(cpu.register_x, 200);
+        assert_eq!(cpu.stack_pointer, 200);
     }
 
     // ------------------------------------------------------------
