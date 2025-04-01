@@ -65,9 +65,7 @@ mod load_tests {
     pub fn lda_zero_flag_status() {
         let test_program: Vec<u8> = vec!(0xa9, 0x00, 0x00);
         let mut cpu = CPU::new();
-        cpu.load(test_program);
-
-        cpu.run();
+        cpu.load_and_run(test_program);
         assert_eq!(cpu.status.0, 0b0000_0010);
     }
 
@@ -75,9 +73,7 @@ mod load_tests {
     pub fn lda_negative_flag_status() {
         let test_program: Vec<u8> = vec!(0xa9, 0xc0, 0x00);
         let mut cpu = CPU::new();
-        cpu.load(test_program);
-
-        cpu.run();
+        cpu.load_and_run(test_program);
         assert_eq!(cpu.status.0, 0b1000_0000);
     }
 
