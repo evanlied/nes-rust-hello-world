@@ -44,8 +44,8 @@ impl CPU {
     }
 
     pub fn load_snake(&mut self, program: Vec<u8>) {
-        self.mem_write_u16(0xFFFC, 0x6000);
-        self.memory[0x6000..(0x6000 + program.len())].copy_from_slice(&program[..]);
+        self.mem_write_u16(0xFFFC, 0x0600);
+        self.memory[0x0600..(0x0600 + program.len())].copy_from_slice(&program[..]);
     }
 
     fn _load(&mut self, program: Vec<u8>, starting_pos: u16) {
@@ -163,7 +163,7 @@ impl CPU {
 
     pub fn load_and_run(&mut self, program: Vec<u8>) {
         self.load(program);
-        self.reset();
+        self.program_counter = self.mem_read_u16(0xFFFC);
         self.run();
     }
 }
