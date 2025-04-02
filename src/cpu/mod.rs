@@ -6,7 +6,7 @@ mod logical_instructions;
 mod addressing_modes;
 mod stack;
 mod status_flags;
-mod opcodes;
+pub mod opcodes;
 
 use opcodes::OP_CODE_REF_TABLE;
 use status_flags::StatusFlag;
@@ -53,21 +53,21 @@ impl CPU {
         self.memory[0x8000..(0x8000 + program.len())].copy_from_slice(&program[..]);
     } 
 
-    fn mem_read(&self, addr: u16) -> u8 {
+    pub fn mem_read(&self, addr: u16) -> u8 {
         self.memory[addr as usize]
     }
 
-    fn mem_write(&mut self, addr: u16, data: u8) {
+    pub fn mem_write(&mut self, addr: u16, data: u8) {
         self.memory[addr as usize] = data;
     }
 
-    fn mem_read_u16(&self, addr: u16) -> u16 {
+    pub fn mem_read_u16(&self, addr: u16) -> u16 {
         let lo = self.mem_read(addr);
         let hi = self.mem_read(addr.wrapping_add(1));
         u16::from_le_bytes([lo, hi])
     }
 
-    fn mem_write_u16(&mut self, addr: u16, data: u16) {
+    pub fn mem_write_u16(&mut self, addr: u16, data: u16) {
         let lo = (data & 0x00FF) as u8;
         let hi = (data >> 8) as u8;
         self.mem_write(addr, lo);
