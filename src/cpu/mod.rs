@@ -6,7 +6,8 @@ mod logical_instructions;
 mod addressing_modes;
 mod stack;
 mod status_flags;
-pub mod opcodes;
+mod opcodes;
+pub mod snake;
 
 use opcodes::OP_CODE_REF_TABLE;
 use status_flags::StatusFlag;
@@ -41,11 +42,6 @@ impl CPU {
 
     pub fn load(&mut self, program: Vec<u8>) {
         self._load(program, 0x8000);
-    }
-
-    pub fn load_snake(&mut self, program: Vec<u8>) {
-        self.mem_write_u16(0xFFFC, 0x0600);
-        self.memory[0x0600..(0x0600 + program.len())].copy_from_slice(&program[..]);
     }
 
     fn _load(&mut self, program: Vec<u8>, starting_pos: u16) {

@@ -1,6 +1,6 @@
 use std::time::Duration;
 
-use nes_rust::{cpu::CPU, snake};
+use nes_rust::{cpu::CPU, cpu::snake};
 use rand::Rng;
 use sdl2::{event::Event, keyboard::Keycode, pixels::{Color, PixelFormatEnum}, EventPump};
 
@@ -39,7 +39,7 @@ fn main() {
             canvas.present();
         }
 
-        std::thread::sleep(Duration::new(0, 70_0000));
+        std::thread::sleep(Duration::from_nanos(70_000));
     });
 }
 
