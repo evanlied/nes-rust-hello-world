@@ -1,4 +1,5 @@
 use super::CPU;
+use crate::MemAccess;
 
 const MAX_STACK: u16 = 0x01FF;
 const MIN_STACK: u16 = 0x0100;

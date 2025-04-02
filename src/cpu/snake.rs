@@ -1,5 +1,6 @@
 use crate::cpu::CPU;
 use crate::cpu::opcodes::OP_CODE_REF_TABLE;
+use crate::MemAccess;
 
 pub fn snake_program() -> Vec<u8> {
     vec!(

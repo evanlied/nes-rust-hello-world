@@ -1,5 +1,6 @@
 use super::CPU;
 use super::addressing_modes::AddressingMode;
+use super::MemAccess;
 
 impl CPU {
     // LDA

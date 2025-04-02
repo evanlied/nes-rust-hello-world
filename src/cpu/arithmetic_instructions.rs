@@ -1,4 +1,5 @@
 use super::{addressing_modes::AddressingMode, CPU};
+use super::MemAccess;
 
 impl CPU {
     pub fn add_with_carry(&mut self, mode: &AddressingMode) {

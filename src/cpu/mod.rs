@@ -12,6 +12,8 @@ pub mod snake;
 use opcodes::OP_CODE_REF_TABLE;
 use status_flags::StatusFlag;
 
+use crate::{bus::Bus, MemAccess};
+
 pub struct CPU {
     pub register_a: u8,
     pub register_x: u8,
@@ -20,10 +22,36 @@ pub struct CPU {
     pub program_counter: u16,
     stack_pointer: u8,
     memory: [u8; 0xFFFF],
+    bus: Bus,
 
     // The JMP Indirect instruction has a bug where fetches on addrress 0xXXFF would return the MSB from
     // 0xXX00 instead of (0xXXFF + 1) (ie XX + 1). For example AAFF would have MSB at AA00 instead of AB00.
     indirect_bug_enabled: bool,
+}
+
+impl MemAccess for CPU {
+    fn mem_read(&self, addr: u16) -> u8 {
+        // self.memory[addr as usize]
+        self.bus.mem_read(addr)
+    }
+
+    fn mem_write(&mut self, addr: u16, data: u8) {
+        // self.memory[addr as usize] = data;
+        self.bus.mem_write(addr, data);
+    }
+
+    fn mem_read_u16(&self, addr: u16) -> u16 {
+        let lo = self.mem_read(addr);
+        let hi = self.mem_read(addr.wrapping_add(1));
+        u16::from_le_bytes([lo, hi])
+    }
+
+    fn mem_write_u16(&mut self, addr: u16, data: u16) {
+        let lo = (data & 0x00FF) as u8;
+        let hi = (data >> 8) as u8;
+        self.mem_write(addr, lo);
+        self.mem_write(addr.wrapping_add(1), hi);
+    }
 }
 
 impl CPU {
@@ -37,6 +65,7 @@ impl CPU {
             stack_pointer: 0,
             memory: [0; 0xFFFF],
             indirect_bug_enabled: false,
+            bus: Bus::new(),
         }
     }
 
@@ -48,27 +77,6 @@ impl CPU {
         self.mem_write_u16(0xFFFC, starting_pos);
         self.memory[0x8000..(0x8000 + program.len())].copy_from_slice(&program[..]);
     } 
-
-    pub fn mem_read(&self, addr: u16) -> u8 {
-        self.memory[addr as usize]
-    }
-
-    pub fn mem_write(&mut self, addr: u16, data: u8) {
-        self.memory[addr as usize] = data;
-    }
-
-    pub fn mem_read_u16(&self, addr: u16) -> u16 {
-        let lo = self.mem_read(addr);
-        let hi = self.mem_read(addr.wrapping_add(1));
-        u16::from_le_bytes([lo, hi])
-    }
-
-    pub fn mem_write_u16(&mut self, addr: u16, data: u16) {
-        let lo = (data & 0x00FF) as u8;
-        let hi = (data >> 8) as u8;
-        self.mem_write(addr, lo);
-        self.mem_write(addr.wrapping_add(1), hi);
-    }
 
     pub fn run(&mut self) {
         loop {

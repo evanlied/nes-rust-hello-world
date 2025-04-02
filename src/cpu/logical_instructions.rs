@@ -1,4 +1,5 @@
 use super::{addressing_modes::AddressingMode, CPU};
+use super::MemAccess;
 
 impl CPU {
     pub fn and(&mut self, mode: &AddressingMode) {
@@ -6,7 +7,6 @@ impl CPU {
         let param = self.mem_read(addr);
         self.register_a = self.register_a & param;
         self.status.set_negative_and_zero_flag(self.register_a);
-        // self.set_status_flag(self.register_a);
     }
 
     pub fn bit_test(&mut self, mode: &AddressingMode) {

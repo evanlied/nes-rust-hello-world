@@ -1,4 +1,5 @@
 use super::{addressing_modes::AddressingMode, CPU};
+use super::MemAccess;
 
 impl CPU {
     // Branch instructions return a bool to let the main body know whether to skip consuming or current PC or not

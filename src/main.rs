@@ -1,6 +1,6 @@
 use std::time::Duration;
 
-use nes_rust::{cpu::CPU, cpu::snake};
+use nes_rust::{cpu::CPU, cpu::snake, MemAccess};
 use rand::Rng;
 use sdl2::{event::Event, keyboard::Keycode, pixels::{Color, PixelFormatEnum}, EventPump};
 

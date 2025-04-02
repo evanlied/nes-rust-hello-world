@@ -1,4 +1,5 @@
 use super::{addressing_modes::AddressingMode, CPU};
+use super::MemAccess;
 
 impl CPU {
     pub fn store_register_a(&mut self, mode: &AddressingMode) {

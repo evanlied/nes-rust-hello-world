@@ -1,4 +1,5 @@
 use super::CPU;
+use super::MemAccess;
 
 #[derive(Clone, Debug)]
 pub enum AddressingMode {
