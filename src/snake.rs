@@ -34,6 +34,7 @@ impl CPU {
             let op_code = self.mem_read(self.program_counter);
             let op_code_params = OP_CODE_REF_TABLE.get(&op_code)
                 .expect(&format!("${op_code:#x} is not a valid operation"));
+            println!("Program counter {:#x} doing {:#x} {} {:?}", self.program_counter, op_code, op_code_params.instruction, op_code_params.addressing_mode);
             self.program_counter += 1;
             match op_code_params.instruction {
                 "ADC" => self.add_with_carry(&op_code_params.addressing_mode),
