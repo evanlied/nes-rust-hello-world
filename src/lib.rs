@@ -1,5 +1,12 @@
 pub mod cpu;
 pub mod bus;
+pub mod rom;
+
+pub enum Mirroring {
+    Vertical,
+    Horizontal,
+    FourScreen,
+}
 
 pub trait MemAccess {
     fn mem_read(&self, addr: u16) -> u8;
