@@ -67,7 +67,7 @@ impl CPU {
             program_counter: 0,
             stack_pointer: 0,
             indirect_bug_enabled: false,
-            bus: Bus::new(),
+            bus: Bus::empty(),
         }
     }
 
