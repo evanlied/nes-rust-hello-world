@@ -6,7 +6,7 @@ const PPU_START: u16 = 0x2000;
 const PPU_END: u16 = 0x3FFF;
 
 pub struct Bus {
-    cpu_vram: [u8; 2048],
+    pub cpu_vram: [u8; 2048],
 }
 
 impl Bus {
@@ -41,5 +41,9 @@ impl MemAccess for Bus {
     fn mem_write(&mut self, addr: u16, data: u8) {
         let mapped_addr = Self::get_mapped_addr(addr);
         self.cpu_vram[mapped_addr as usize] = data;
+    }
+
+    fn bulk_write(&mut self, start: usize, end: usize, program: Vec<u8>) {
+        self.cpu_vram[start..end].copy_from_slice(&program);
     }
 }

@@ -29,7 +29,7 @@ mod store_test {
         cpu.mem_write(0, 0xAB);
         
         cpu.store_register_a(&AddressingMode::ZeroPage);
-        assert_eq!(cpu.memory[0x00AB], 0x69);
+        assert_eq!(cpu.mem_read(0xAB), 0x69);
     }
 
     #[test]

@@ -21,7 +21,6 @@ pub struct CPU {
     pub status: StatusFlag,
     pub program_counter: u16,
     stack_pointer: u8,
-    memory: [u8; 0xFFFF],
     bus: Bus,
 
     // The JMP Indirect instruction has a bug where fetches on addrress 0xXXFF would return the MSB from
@@ -52,6 +51,10 @@ impl MemAccess for CPU {
         self.mem_write(addr, lo);
         self.mem_write(addr.wrapping_add(1), hi);
     }
+
+    fn bulk_write(&mut self, start: usize, end: usize, program: Vec<u8>) {
+        self.bus.bulk_write(start, end, program);
+    }
 }
 
 impl CPU {
@@ -63,7 +66,6 @@ impl CPU {
             status: StatusFlag(0),
             program_counter: 0,
             stack_pointer: 0,
-            memory: [0; 0xFFFF],
             indirect_bug_enabled: false,
             bus: Bus::new(),
         }
@@ -75,7 +77,7 @@ impl CPU {
 
     fn _load(&mut self, program: Vec<u8>, starting_pos: u16) {
         self.mem_write_u16(0xFFFC, starting_pos);
-        self.memory[0x8000..(0x8000 + program.len())].copy_from_slice(&program[..]);
+        self.bulk_write(0x8000, 0x8000 + program.len(), program);
     } 
 
     pub fn run(&mut self) {
@@ -621,8 +623,7 @@ mod cpu_tests {
         cpu.register_a = 0x99;
         cpu.register_x = 0xAA;
         cpu.status.0 = 0xAB;
-        cpu.memory[0xFFFC] = 0xCD;
-        cpu.memory[0xFFFD] = 0xAB;
+        cpu.mem_write_u16(0xFFFC, 0xABCD);
 
         cpu.reset();
         assert_eq!(cpu.register_a, 0);

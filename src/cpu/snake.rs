@@ -30,7 +30,8 @@ pub fn snake_program() -> Vec<u8> {
 impl CPU {
     pub fn load_snake(&mut self, program: Vec<u8>) {
         self.mem_write_u16(0xFFFC, 0x0600);
-        self.memory[0x0600..(0x0600 + program.len())].copy_from_slice(&program[..]);
+        self.bulk_write(0x600, 0x600 + program.len(), program);
+        // self.memory[0x0600..(0x0600 + program.len())].copy_from_slice(&program[..]);
     }
 
     pub fn run_with_callback<F> (&mut self, mut callback: F) 

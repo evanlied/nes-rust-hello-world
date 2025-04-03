@@ -64,7 +64,7 @@ impl CPU {
             AddressingMode::Accumulator => (self.register_a, &mut self.register_a),
             _ => {
                 let addr = self.get_operand_address(mode);
-                (self.mem_read(addr), &mut self.memory[addr as usize])
+                (self.mem_read(addr), &mut self.bus.cpu_vram[addr as usize])
             }
         }
     }
@@ -84,9 +84,9 @@ mod test_addressing_modes {
     #[test]
     pub fn zero_page_addr() {
         let mut cpu = CPU::new();
-        cpu.program_counter = 0x8000;
-        cpu.memory[0x8000] = 0x05;
-        cpu.memory[0x8001] = 0x0A;
+        cpu.program_counter = 0x800;
+        cpu.mem_write(0x800, 0x05);
+        cpu.mem_write(0x801, 0x0A);
         cpu.register_x = 0x06;
         cpu.register_y = 0x05;
         assert_eq!(cpu.get_operand_address(&AddressingMode::ZeroPage), 0x05);
@@ -95,9 +95,9 @@ mod test_addressing_modes {
     #[test]
     pub fn zero_page_x_addr() {
         let mut cpu = CPU::new();
-        cpu.program_counter = 0x8000;
-        cpu.memory[0x8000] = 0x05;
-        cpu.memory[0x8001] = 0x0A;
+        cpu.program_counter = 0x800;
+        cpu.mem_write(0x800, 0x05);
+        cpu.mem_write(0x801, 0x0A);
         cpu.register_x = 0x06;
         cpu.register_y = 0x05;
         assert_eq!(cpu.get_operand_address(&AddressingMode::ZeroPageX), 0x0B);
@@ -106,9 +106,9 @@ mod test_addressing_modes {
     #[test]
     pub fn zero_page_y_addr() {
         let mut cpu = CPU::new();
-        cpu.program_counter = 0x8000;
-        cpu.memory[0x8000] = 0x05;
-        cpu.memory[0x8001] = 0x0A;
+        cpu.program_counter = 0x800;
+        cpu.mem_write(0x800, 0x05);
+        cpu.mem_write(0x801, 0x0A);
         cpu.register_x = 0x06;
         cpu.register_y = 0x05;
         assert_eq!(cpu.get_operand_address(&AddressingMode::ZeroPageY), 0x0A);
@@ -117,9 +117,9 @@ mod test_addressing_modes {
     #[test]
     pub fn absolute_addr() {
         let mut cpu = CPU::new();
-        cpu.program_counter = 0x8000;
-        cpu.memory[0x8000] = 0x05;
-        cpu.memory[0x8001] = 0x0A;
+        cpu.program_counter = 0x800;
+        cpu.mem_write(0x800, 0x05);
+        cpu.mem_write(0x801, 0x0A);
         cpu.register_x = 0x06;
         cpu.register_y = 0x05;
         assert_eq!(cpu.get_operand_address(&AddressingMode::Absolute), 0x0A05);
@@ -128,9 +128,9 @@ mod test_addressing_modes {
     #[test]
     pub fn absolute_x_addr() {
         let mut cpu = CPU::new();
-        cpu.program_counter = 0x8000;
-        cpu.memory[0x8000] = 0x05;
-        cpu.memory[0x8001] = 0x0A;
+        cpu.program_counter = 0x800;
+        cpu.mem_write(0x800, 0x05);
+        cpu.mem_write(0x801, 0x0A);
         cpu.register_x = 0x06;
         cpu.register_y = 0x05;
         assert_eq!(cpu.get_operand_address(&AddressingMode::AbsoluteX), 0x0A0B);
@@ -139,9 +139,9 @@ mod test_addressing_modes {
     #[test]
     pub fn absolute_y_addr() {
         let mut cpu = CPU::new();
-        cpu.program_counter = 0x8000;
-        cpu.memory[0x8000] = 0x05;
-        cpu.memory[0x8001] = 0x0A;
+        cpu.program_counter = 0x800;
+        cpu.mem_write(0x800, 0x05);
+        cpu.mem_write(0x801, 0x0A);
         cpu.register_x = 0x06;
         cpu.register_y = 0x05;
         assert_eq!(cpu.get_operand_address(&AddressingMode::AbsoluteY), 0x0A0A);
@@ -151,10 +151,10 @@ mod test_addressing_modes {
     pub fn indirect_x_addr() {
         let mut cpu = CPU::new();
         cpu.program_counter = 0x8000;
-        cpu.memory[0x8000] = 0x05;
-        cpu.memory[0x8001] = 0x0A;
-        cpu.memory[0x000B] = 0x12;
-        cpu.memory[0x000C] = 0x0C;
+        cpu.mem_write(0x800, 0x05);
+        cpu.mem_write(0x801, 0x0A);
+        cpu.mem_write(0xB, 0x12);
+        cpu.mem_write(0xC, 0xC);
         cpu.register_x = 0x06;
         cpu.register_y = 0x05;
         assert_eq!(cpu.get_operand_address(&AddressingMode::IndirectX), 0x0C12);
@@ -163,11 +163,11 @@ mod test_addressing_modes {
     #[test]
     pub fn indirect_y_addr() {
         let mut cpu = CPU::new();
-        cpu.program_counter = 0x8000;
-        cpu.memory[0x8000] = 0x05;
-        cpu.memory[0x8001] = 0x0A;
-        cpu.memory[0x000A] = 0x12;
-        cpu.memory[0x000B] = 0x0C;
+        cpu.program_counter = 0x800;
+        cpu.mem_write(0x800, 0x05);
+        cpu.mem_write(0x801, 0x0A);
+        cpu.mem_write(0xA, 0x12);
+        cpu.mem_write(0xB, 0xC);
         cpu.register_x = 0x06;
         cpu.register_y = 0x05;
         assert_eq!(cpu.get_operand_address(&AddressingMode::IndirectY), 0x0C12);
@@ -176,9 +176,9 @@ mod test_addressing_modes {
     #[test]
     pub fn indirect_bug_disabled() {
         let mut cpu = CPU::new();
-        cpu.program_counter = 0x8000;
-        cpu.mem_write_u16(0x8000, 0x11FF);
-        cpu.mem_write_u16(0x11FF, 0xABAB);
+        cpu.program_counter = 0x800;
+        cpu.mem_write_u16(0x800, 0x1FF);
+        cpu.mem_write_u16(0x1FF, 0xABAB);
         assert_eq!(cpu.get_operand_address(&AddressingMode::Indirect), 0xABAB);
     }
 
@@ -186,10 +186,10 @@ mod test_addressing_modes {
     pub fn indirect_bug_enabled() {
         let mut cpu = CPU::new();
         cpu.indirect_bug_enabled = true;
-        cpu.program_counter = 0x8000;
-        cpu.mem_write_u16(0x8000, 0x11FF);
-        cpu.mem_write(0x11FF, 0xCD);
-        cpu.mem_write(0x1100, 0xAB);
+        cpu.program_counter = 0x800;
+        cpu.mem_write_u16(0x800, 0x1FF);
+        cpu.mem_write(0x1FF, 0xCD);
+        cpu.mem_write(0x100, 0xAB);
         assert_eq!(cpu.get_operand_address(&AddressingMode::Indirect), 0xABCD);
     }
 }

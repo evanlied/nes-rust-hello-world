@@ -71,7 +71,7 @@ impl CPU {
             AddressingMode::Accumulator => (self.register_a, &mut self.register_a),
             _ => {
                 let addr = self.get_operand_address(&mode);
-                (self.mem_read(addr), &mut self.memory[addr as usize])
+                (self.mem_read(addr), &mut self.mem_read(addr))
             }
         };
         let new_val = old_val << 1;
