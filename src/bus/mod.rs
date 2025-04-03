@@ -69,7 +69,16 @@ impl MemAccess for Bus {
                 todo!("PPU not supported yet")
             },
             ROM_START..=ROM_END => {
-                panic!("Attempt to write to Cartridge ROM space")
+                match cfg!(test) {
+                    true => {
+                        let mut addr = addr - 0x8000;
+                        if self.rom.prg_rom.len() == 0x4000 && addr >= 0x4000 {
+                            addr = addr % 0x4000;
+                        }
+                        self.rom.prg_rom[addr as usize] = data;
+                    },
+                    false => panic!("Attempt to write to Cartridge ROM space"),
+                }
             },
             _ => {
                 println!("Invalid RAM access at {:#x}", addr);

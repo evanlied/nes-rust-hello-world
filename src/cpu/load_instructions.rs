@@ -95,8 +95,8 @@ mod load_tests {
         let mut cpu = CPU::new();
         cpu.program_counter = 0x8000;
         cpu.register_x = 2;
-        cpu.mem_write_u16(0x8000, 0x7000);
-        cpu.mem_write(0x7002, 0xC);
+        cpu.mem_write_u16(0x8000, 0x700);
+        cpu.mem_write(0x702, 0xC);
         cpu.load_register_y(&AddressingMode::AbsoluteX);
         assert_eq!(cpu.register_y, 0xC);
         assert_eq!(cpu.status.0, 0);

@@ -34,10 +34,26 @@ impl CPU {
         self.status.set_negative_and_zero_flag(self.register_a);
     }
 
+    fn perform_op_on_mem<F: FnMut(u8) -> u8>(&mut self, mode: &AddressingMode, mut op: F) -> (u8, u8) {
+        match mode {
+            AddressingMode::Accumulator => {
+                let old_val = self.register_a;
+                self.register_a = op(old_val);
+                (old_val, self.register_a)
+            },
+            _ => {
+                let addr = self.get_operand_address(mode);
+                let old_val = self.mem_read(addr);
+                let new_val = op(old_val);
+                self.mem_write(addr, new_val);
+                (old_val, new_val)
+            }
+        }
+    }
+
     pub fn logical_shift_right(&mut self, mode: &AddressingMode) {
-        let (old_val, mem_ptr) = self.get_val_and_mem_ptr(mode);
-        let new_val = old_val >> 1;
-        *mem_ptr = new_val;
+        let (old_val, new_val) = self
+            .perform_op_on_mem(mode, |old_val| old_val >> 1);
 
         self.status.set_carry_flag(old_val & 0b0000_0001 != 0);
         self.status.set_zero_flag(new_val);
@@ -45,18 +61,16 @@ impl CPU {
     }
 
     pub fn rotate_left(&mut self, mode: &AddressingMode) {
-        let (old_val, mem_ptr) = self.get_val_and_mem_ptr(mode);
-        let new_val = old_val.rotate_left(1);
-        *mem_ptr = new_val;
+        let (old_val, new_val) = self
+            .perform_op_on_mem(mode, |old_val| old_val.rotate_left(1));
 
         self.status.set_carry_flag(old_val & 0b1000_0000 != 0);
         self.status.set_negative_and_zero_flag(new_val);
     }
 
     pub fn rotate_right(&mut self, mode: &AddressingMode) {
-        let (old_val, mem_ptr) = self.get_val_and_mem_ptr(mode);
-        let new_val = old_val.rotate_right(1);
-        *mem_ptr = new_val;
+        let (old_val, new_val) = self
+            .perform_op_on_mem(mode, |old_val| old_val.rotate_right(1));
 
         self.status.set_carry_flag(old_val & 0b0000_0001 != 0);
         self.status.set_negative_and_zero_flag(new_val);
@@ -145,15 +159,15 @@ mod logical_tests {
     pub fn rotate_left() {
         let mut cpu = CPU::new();
         cpu.program_counter = 0x8000;
-        cpu.mem_write(0x7000, 0b0000_1111);
-        cpu.mem_write_u16(0x8000, 0x7000);
+        cpu.mem_write(0x70, 0b0000_1111);
+        cpu.mem_write_u16(0x8000, 0x70);
         cpu.rotate_left(&AddressingMode::Absolute);
-        assert_eq!(cpu.mem_read(0x7000), 0b0001_1110);
+        assert_eq!(cpu.mem_read(0x70), 0b0001_1110);
         assert_eq!(cpu.status.0, 0b0);
 
-        cpu.mem_write(0x7000, 0b0);
+        cpu.mem_write(0x70, 0b0);
         cpu.rotate_left(&AddressingMode::Absolute);
-        assert_eq!(cpu.mem_read(0x7000), 0);
+        assert_eq!(cpu.mem_read(0x70), 0);
         assert_eq!(cpu.status.0, 0b0000_0010);
     }
 
@@ -161,15 +175,15 @@ mod logical_tests {
     pub fn rotate_right() {
         let mut cpu = CPU::new();
         cpu.program_counter = 0x8000;
-        cpu.mem_write(0x7000, 0b0000_1111);
-        cpu.mem_write_u16(0x8000, 0x7000);
+        cpu.mem_write(0x70, 0b0000_1111);
+        cpu.mem_write_u16(0x8000, 0x70);
         cpu.rotate_right(&AddressingMode::Absolute);
-        assert_eq!(cpu.mem_read(0x7000), 0b1000_0111);
+        assert_eq!(cpu.mem_read(0x70), 0b1000_0111);
         assert_eq!(cpu.status.0, 0b1000_0001);
 
-        cpu.mem_write(0x7000, 0b0);
+        cpu.mem_write(0x70, 0b0);
         cpu.rotate_right(&AddressingMode::Absolute);
-        assert_eq!(cpu.mem_read(0x7000), 0);
+        assert_eq!(cpu.mem_read(0x70), 0);
         assert_eq!(cpu.status.0, 0b0000_0010);
     }
 }

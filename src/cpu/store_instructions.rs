@@ -36,9 +36,9 @@ mod store_test {
     fn stx_absolute() {
         let mut cpu = CPU::new();
         cpu.register_x = 0x72;
-        cpu.mem_write_u16(0, 0x7000);
+        cpu.mem_write_u16(0, 0x700);
         cpu.store_register_x(&AddressingMode::Absolute);
-        assert_eq!(cpu.mem_read(0x7000), 0x72);
+        assert_eq!(cpu.mem_read(0x700), 0x72);
     }
 
     #[test]

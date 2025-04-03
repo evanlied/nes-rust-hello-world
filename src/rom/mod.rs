@@ -93,7 +93,7 @@ mod rom_constructor_test {
 
     #[test]
     pub fn positive_test_case() {
-        let mut tester = get_test_raw();
+        let tester = get_test_raw();
         match Rom::new(&tester) {
             Ok(_) => (),
             Err(_) => panic!("Should have built"),

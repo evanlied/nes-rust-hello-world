@@ -77,7 +77,9 @@ impl CPU {
 
     fn _load(&mut self, program: Vec<u8>, starting_pos: u16) {
         self.mem_write_u16(0xFFFC, starting_pos);
-        self.bulk_write(0x8000, 0x8000 + program.len(), program);
+        for (index, data) in program.iter().enumerate() {
+            self.mem_write(starting_pos + index as u16, *data);
+        }
     } 
 
     pub fn run(&mut self) {
@@ -364,8 +366,8 @@ mod cpu_tests {
         let mut cpu = CPU::new();
         cpu.register_x = 0x15;
         cpu.program_counter = 0x8000;
-        cpu.mem_write_u16(0x7000, 0x15);
-        cpu.load(vec!(0xEC, 0x0, 0x70, 0x00));
+        cpu.mem_write_u16(0x700, 0x15);
+        cpu.load(vec!(0xEC, 0x0, 0x7, 0x00));
         cpu.run();
 
         assert_eq!(cpu.program_counter, 0x8004);
@@ -377,8 +379,8 @@ mod cpu_tests {
         let mut cpu = CPU::new();
         cpu.register_y = 0xAB;
         cpu.program_counter = 0x8000;
-        cpu.mem_write_u16(0x7000, 0xA0);
-        cpu.load(vec!(0xCC, 0x0, 0x70, 0x00));
+        cpu.mem_write_u16(0x700, 0xA0);
+        cpu.load(vec!(0xCC, 0x0, 0x7, 0x00));
         cpu.run();
 
         assert_eq!(cpu.program_counter, 0x8004);
@@ -388,10 +390,10 @@ mod cpu_tests {
     #[test]
     pub fn dec_instruction() {
         let mut cpu = CPU::new();
-        cpu.mem_write(0x7000, 155);
-        cpu.load_and_run(vec!(0xCE, 0x0, 0x70, 0x00));
+        cpu.mem_write(0x700, 155);
+        cpu.load_and_run(vec!(0xCE, 0x0, 0x7, 0x00));
 
-        assert_eq!(cpu.mem_read(0x7000), 154);
+        assert_eq!(cpu.mem_read(0x700), 154);
         assert_eq!(cpu.status.0, 0b1000_0000);
         assert_eq!(cpu.program_counter, 0x8004);
     }
@@ -429,10 +431,10 @@ mod cpu_tests {
     #[test]
     pub fn inc_instruction() {
         let mut cpu = CPU::new();
-        cpu.mem_write(0x7000, 0xD2);
-        cpu.load_and_run(vec!(0xEE, 0x0, 0x70, 0x00));
+        cpu.mem_write(0x700, 0xD2);
+        cpu.load_and_run(vec!(0xEE, 0x0, 0x7, 0x00));
         assert_eq!(cpu.program_counter, 0x8004);
-        assert_eq!(cpu.mem_read(0x7000), 0xD3);
+        assert_eq!(cpu.mem_read(0x700), 0xD3);
         assert_eq!(cpu.status.0, 0b1000_0000);
     }
 
@@ -466,8 +468,8 @@ mod cpu_tests {
     #[test]
     pub fn jmp_instruction() {
         let mut cpu = CPU::new();
-        cpu.mem_write_u16(0x7000, 0xABCD);
-        cpu.load_and_run(vec!(0x4C, 0x05, 0x80, 0x00, 0x00, 0x6C, 0x00, 0x70, 0x00));
+        cpu.mem_write_u16(0x700, 0xABCD);
+        cpu.load_and_run(vec!(0x4C, 0x05, 0x80, 0x00, 0x00, 0x6C, 0x00, 0x7, 0x00));
         assert_eq!(cpu.program_counter, 0xABCE);
     }
 

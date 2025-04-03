@@ -150,7 +150,7 @@ mod test_addressing_modes {
     #[test]
     pub fn indirect_x_addr() {
         let mut cpu = CPU::new();
-        cpu.program_counter = 0x8000;
+        cpu.program_counter = 0x800;
         cpu.mem_write(0x800, 0x05);
         cpu.mem_write(0x801, 0x0A);
         cpu.mem_write(0xB, 0x12);
