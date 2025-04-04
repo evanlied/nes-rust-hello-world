@@ -25,6 +25,4 @@ pub trait MemAccess {
         self.mem_write(addr, lo);
         self.mem_write(addr.wrapping_add(1), hi);
     }
-
-    fn bulk_write(&mut self, start: usize, end: usize, program: Vec<u8>); 
 }

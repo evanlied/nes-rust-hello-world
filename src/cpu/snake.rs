@@ -1,5 +1,8 @@
+use std::fs::read;
+
 use crate::cpu::CPU;
 use crate::cpu::opcodes::OP_CODE_REF_TABLE;
+use crate::rom::Rom;
 use crate::MemAccess;
 
 pub fn snake_program() -> Vec<u8> {
@@ -28,10 +31,10 @@ pub fn snake_program() -> Vec<u8> {
 }
 
 impl CPU {
-    pub fn load_snake(&mut self, program: Vec<u8>) {
-        self.mem_write_u16(0xFFFC, 0x0600);
-        self.bulk_write(0x600, 0x600 + program.len(), program);
-        // self.memory[0x0600..(0x0600 + program.len())].copy_from_slice(&program[..]);
+    pub fn load_snake(&mut self) {
+        let snake_file = read("./snake.nes").unwrap();
+        let snake_rom = Rom::new(&snake_file).unwrap();
+        self.load_rom(snake_rom);
     }
 
     pub fn run_with_callback<F> (&mut self, mut callback: F) 

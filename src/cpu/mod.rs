@@ -12,7 +12,7 @@ pub mod snake;
 use opcodes::OP_CODE_REF_TABLE;
 use status_flags::StatusFlag;
 
-use crate::{bus::Bus, MemAccess};
+use crate::{bus::Bus, rom::Rom, MemAccess};
 
 pub struct CPU {
     pub register_a: u8,
@@ -51,10 +51,6 @@ impl MemAccess for CPU {
         self.mem_write(addr, lo);
         self.mem_write(addr.wrapping_add(1), hi);
     }
-
-    fn bulk_write(&mut self, start: usize, end: usize, program: Vec<u8>) {
-        self.bus.bulk_write(start, end, program);
-    }
 }
 
 impl CPU {
@@ -73,6 +69,10 @@ impl CPU {
 
     pub fn load(&mut self, program: Vec<u8>) {
         self._load(program, 0x8000);
+    }
+
+    pub fn load_rom(&mut self, rom: Rom) {
+        self.bus.load_rom(rom);
     }
 
     fn _load(&mut self, program: Vec<u8>, starting_pos: u16) {

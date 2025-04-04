@@ -2,8 +2,8 @@ use crate::Mirroring;
 
 // TODO update these with the actual values later
 const NES_TAG: [u8; 4] = [0x4E, 0x45, 0x53, 0x1A];
-const PGR_ROM_PAGE_SIZE: usize = 1024;
-const CHR_ROM_PAGE_SIZE: usize = 1024;
+const PGR_ROM_PAGE_SIZE: usize = 16384;
+const CHR_ROM_PAGE_SIZE: usize = 8192;
 
 pub struct Rom {
     pub prg_rom: Vec<u8>,
@@ -42,6 +42,8 @@ impl Rom {
 
         let prg_rom_start = 16 + if skip_trainer { 512 } else { 0 };
         let chr_rom_start = prg_rom_start + prg_rom_size;
+
+        dbg!(skip_trainer, prg_rom_start, chr_rom_start);
 
         Ok(Rom {
             prg_rom: raw[prg_rom_start..(prg_rom_start + prg_rom_size)].to_vec(),

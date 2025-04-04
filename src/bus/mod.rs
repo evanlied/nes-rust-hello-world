@@ -32,6 +32,10 @@ impl Bus {
         }
     }
 
+    pub fn load_rom(&mut self, rom: Rom) {
+        self.rom = rom;
+    }
+
     pub fn read_prg_rom(&self, addr: u16) -> u8 {
         let mut addr = addr - 0x8000;
         if self.rom.prg_rom.len() == 0x4000 && addr >= 0x4000 {
@@ -84,9 +88,5 @@ impl MemAccess for Bus {
                 println!("Invalid RAM access at {:#x}", addr);
             }
         }
-    }
-
-    fn bulk_write(&mut self, start: usize, end: usize, program: Vec<u8>) {
-        self.cpu_vram[start..end].copy_from_slice(&program);
     }
 }
