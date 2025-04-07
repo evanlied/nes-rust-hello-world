@@ -7,6 +7,7 @@ mod addressing_modes;
 mod stack;
 mod status_flags;
 mod opcodes;
+mod format_test;
 pub mod snake;
 
 use opcodes::OP_CODE_REF_TABLE;
@@ -65,6 +66,10 @@ impl CPU {
             indirect_bug_enabled: false,
             bus: Bus::empty(),
         }
+    }
+
+    pub fn new_with_bus(bus: Bus) -> Self {
+        CPU { bus, ..CPU::new() }
     }
 
     pub fn load(&mut self, program: Vec<u8>) {
