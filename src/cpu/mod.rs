@@ -3,11 +3,10 @@ mod store_instructions;
 mod branching_instructions;
 mod arithmetic_instructions;
 mod logical_instructions;
-mod addressing_modes;
+pub mod addressing_modes;
 mod stack;
 mod status_flags;
-mod opcodes;
-mod format_test;
+pub mod opcodes;
 pub mod snake;
 
 use opcodes::OP_CODE_REF_TABLE;
@@ -21,7 +20,7 @@ pub struct CPU {
     pub register_y: u8,
     pub status: StatusFlag,
     pub program_counter: u16,
-    stack_pointer: u8,
+    pub stack_pointer: u8,
     bus: Bus,
 
     // The JMP Indirect instruction has a bug where fetches on addrress 0xXXFF would return the MSB from

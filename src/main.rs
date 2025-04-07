@@ -1,45 +1,56 @@
 use std::time::Duration;
 
-use nes_rust::{cpu::CPU, cpu::snake, MemAccess};
+use nes_rust::{cpu::{snake, CPU}, format_test::trace, rom::Rom, MemAccess};
 use rand::Rng;
 use sdl2::{event::Event, keyboard::Keycode, pixels::{Color, PixelFormatEnum}, EventPump};
 
+// This code block will run the snake program
+// fn main() {
+//     let snake_program = snake::snake_program();
+//     let mut cpu = CPU::new();
+
+//     let sdl_context = sdl2::init().unwrap();
+//     let video_sys = sdl_context.video().unwrap();
+//     let window = video_sys
+//         .window("Snake game", 320, 320)
+//         .position_centered()
+//         .build().unwrap();
+
+//     let mut canvas = window.into_canvas().present_vsync().build().unwrap();
+//     let mut event_pump = sdl_context.event_pump().unwrap();
+//     canvas.set_scale(10.0, 10.0).unwrap();
+
+//     let creator = canvas.texture_creator();
+//     let mut texture = creator
+//         .create_texture_target(PixelFormatEnum::RGB24, 32, 32)
+//         .unwrap();
+
+//     let mut screen_state = [0 as u8; 32 * 32 * 3];
+//     let mut rng = rand::thread_rng();
+
+//     cpu.load_snake();
+//     cpu.reset();
+//     cpu.run_with_callback(move |cpu| {
+//         handle_user_input(cpu, &mut event_pump);
+//         cpu.mem_write(0xFE, rng.gen_range(1, 16));
+
+//         if read_screen_state(cpu, &mut screen_state) {
+//             texture.update(None, &screen_state, 32 * 3).unwrap();
+//             canvas.copy(&texture, None, None).unwrap();
+//             canvas.present();
+//         }
+
+//         std::thread::sleep(Duration::from_nanos(70_000));
+//     });
+// }
+
+// This code block is used for test rom logging
 fn main() {
-    let snake_program = snake::snake_program();
     let mut cpu = CPU::new();
-
-    let sdl_context = sdl2::init().unwrap();
-    let video_sys = sdl_context.video().unwrap();
-    let window = video_sys
-        .window("Snake game", 320, 320)
-        .position_centered()
-        .build().unwrap();
-
-    let mut canvas = window.into_canvas().present_vsync().build().unwrap();
-    let mut event_pump = sdl_context.event_pump().unwrap();
-    canvas.set_scale(10.0, 10.0).unwrap();
-
-    let creator = canvas.texture_creator();
-    let mut texture = creator
-        .create_texture_target(PixelFormatEnum::RGB24, 32, 32)
-        .unwrap();
-
-    let mut screen_state = [0 as u8; 32 * 32 * 3];
-    let mut rng = rand::thread_rng();
-
-    cpu.load_snake();
+    cpu.load_rom(Rom::from_rom("./nestest.nes").unwrap());
     cpu.reset();
-    cpu.run_with_callback(move |cpu| {
-        handle_user_input(cpu, &mut event_pump);
-        cpu.mem_write(0xFE, rng.gen_range(1, 16));
-
-        if read_screen_state(cpu, &mut screen_state) {
-            texture.update(None, &screen_state, 32 * 3).unwrap();
-            canvas.copy(&texture, None, None).unwrap();
-            canvas.present();
-        }
-
-        std::thread::sleep(Duration::from_nanos(70_000));
+    cpu.run_with_callback(|cpu| {
+        println!("{}", trace(cpu));
     });
 }
 
