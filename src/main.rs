@@ -29,7 +29,6 @@ fn main() {
 
     cpu.load_snake();
     cpu.reset();
-    dbg!(cpu.program_counter);
     cpu.run_with_callback(move |cpu| {
         handle_user_input(cpu, &mut event_pump);
         cpu.mem_write(0xFE, rng.gen_range(1, 16));
