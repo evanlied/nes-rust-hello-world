@@ -52,6 +52,11 @@ impl Rom {
             screen_mirroring
         })
     }
+
+    pub fn from_rom(path: &str) -> Result<Rom, String> {
+        let file = std::fs::read(path).unwrap();
+        Rom::new(&file)
+    }
 }
 
 #[cfg(test)]
