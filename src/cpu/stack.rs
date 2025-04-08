@@ -42,7 +42,7 @@ impl CPU {
 
     pub fn pull_accumulator(&mut self) {
         self.register_a = self.pop_stack();
-        self.status.set_zero_flag(self.register_a);
+        self.status.set_negative_and_zero_flag(self.register_a);
     }
 }
 
