@@ -1,6 +1,15 @@
 use super::{addressing_modes::AddressingMode, CPU};
 use super::MemAccess;
 
+// To be used with add_with_carry and subtract_with_carry functions
+fn is_sign_incorrect(new_val: u8, old_val: u8, param: u8) -> u8 {
+    if ((param ^ new_val) & (new_val ^ old_val) & 0x80) != 0 {
+        return 0b0100_0000 // signs are incorrect, set overflow bit
+    } else {
+        return 0b0; // signs are correct, don't set overflow bit
+    }
+}
+
 impl CPU {
     pub fn add_with_carry(&mut self, mode: &AddressingMode) {
         let addr = self.get_operand_address(mode);
@@ -9,9 +18,10 @@ impl CPU {
         let result: u16 = (self.register_a as u16) + (param as u16) + carry;
         let normalized_result = (result % 256) as u8;
 
-        self.register_a = normalized_result;
         self.status.set_carry_flag(result > 255);
+        self.status.set_overflow_flag(is_sign_incorrect(normalized_result, self.register_a, param));
         self.status.set_negative_and_zero_flag(normalized_result);
+        self.register_a = normalized_result;
     }
 
     pub fn subtract_with_carry(&mut self, mode: &AddressingMode) {
@@ -22,9 +32,10 @@ impl CPU {
             + ((param as i8).wrapping_neg() as u8) as u16;
         let normalized_result = (result % 256) as u8;
 
-        self.register_a = normalized_result;
         self.status.set_carry_flag(result > 255);
+        self.status.set_overflow_flag(is_sign_incorrect(normalized_result, self.register_a, param));
         self.status.set_negative_and_zero_flag(normalized_result);
+        self.register_a = normalized_result;
     }
 
     pub fn increment_x(&mut self) {
@@ -143,10 +154,9 @@ mod arithmetic_test {
         cpu.mem_write(0x8000, 10);
         cpu.subtract_with_carry(&AddressingMode::Immediate);
         assert_eq!(cpu.register_a, 251);
-        assert_eq!(cpu.status.0, 0b1010_0100);
+        assert_eq!(cpu.status.0, 0b1110_0100);
 
         cpu.register_a = (125 as i8).wrapping_neg() as u8;
-        println!("{:#8b}", cpu.register_a);
         cpu.mem_write(0x8000, 10);
         cpu.subtract_with_carry(&AddressingMode::Immediate);
         assert_eq!(cpu.register_a, 121);
