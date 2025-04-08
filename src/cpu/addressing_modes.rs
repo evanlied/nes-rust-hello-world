@@ -1,7 +1,7 @@
 use super::CPU;
 use super::MemAccess;
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq)]
 pub enum AddressingMode {
     Immediate,
     Accumulator,

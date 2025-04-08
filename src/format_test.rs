@@ -16,7 +16,7 @@ pub fn trace(cpu: &mut CPU) -> String {
         )
     };
     let op_code_parametize: String = {
-        let trimmed_addr = op_code_args.trim();
+        let trimmed_addr = op_code_args.replace(" ", "");
         let is_indirect = match op_code.addressing_mode {
             AddressingMode::IndirectX | AddressingMode::IndirectY => true,
             _ => false,
@@ -26,7 +26,12 @@ pub fn trace(cpu: &mut CPU) -> String {
 
         else if is_indirect {
             format!("(${trimmed_addr})")
-        } 
+        }
+
+        else if op_code.addressing_mode == AddressingMode::Relative {
+            let offset = cpu.mem_read(cpu.program_counter.wrapping_add(1)) as u16;
+            format!("${:04X}  ", cpu.program_counter.wrapping_add(offset).wrapping_add(2))
+        }
 
         else { format!("#${trimmed_addr:<4} ") }
     };
