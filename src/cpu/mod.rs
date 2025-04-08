@@ -30,12 +30,10 @@ pub struct CPU {
 
 impl MemAccess for CPU {
     fn mem_read(&self, addr: u16) -> u8 {
-        // self.memory[addr as usize]
         self.bus.mem_read(addr)
     }
 
     fn mem_write(&mut self, addr: u16, data: u8) {
-        // self.memory[addr as usize] = data;
         self.bus.mem_write(addr, data);
     }
 
@@ -61,7 +59,7 @@ impl CPU {
             register_y: 0,
             status: StatusFlag(0),
             program_counter: 0,
-            stack_pointer: 0,
+            stack_pointer: 0xFD,
             indirect_bug_enabled: false,
             bus: Bus::empty(),
         }
@@ -170,7 +168,7 @@ impl CPU {
         self.register_y = 0;
         self.status = StatusFlag(0);
         self.program_counter = self.mem_read_u16(0xFFFC);
-        self.stack_pointer = 0x0;
+        self.stack_pointer = 0xFD;
     }
 
     pub fn load_and_run(&mut self, program: Vec<u8>) {
@@ -516,9 +514,9 @@ mod cpu_tests {
         let mut cpu = CPU::new();
         cpu.load_and_run(vec!(0xA9, 0xF0, 0x48, 0x69, 0x5, 0x68, 0x00));
         assert_eq!(cpu.program_counter, 0x8007);
-        assert_eq!(cpu.mem_read(0x100), 0xF0);
+        assert_eq!(cpu.mem_read(0xFD), 0xF0);
         assert_eq!(cpu.register_a, 0xF0);
-        assert_eq!(cpu.stack_pointer, 0x0);
+        assert_eq!(cpu.stack_pointer, 0xFD);
     }
 
     #[test]
@@ -527,7 +525,7 @@ mod cpu_tests {
         cpu.load_and_run(vec!(0xA9, 0xFF, 0x08, 0x69, 0x10, 0x28, 0x0));
         assert_eq!(cpu.program_counter, 0x8007);
         assert_eq!(cpu.status.0, 0b1010_0000);
-        assert_eq!(cpu.mem_read(0x100), 0b1000_0000);
+        assert_eq!(cpu.mem_read(0xFD), 0b1000_0000);
     }
 
     #[test]
@@ -549,7 +547,7 @@ mod cpu_tests {
         cpu.run();
         assert_eq!(cpu.program_counter, 0x8051);
         assert_eq!(cpu.status.0, 0b1010_0010);
-        assert_eq!(cpu.stack_pointer, 0x0);
+        assert_eq!(cpu.stack_pointer, 0xFD);
     }
 
     #[test]

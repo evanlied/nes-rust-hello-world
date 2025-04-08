@@ -60,7 +60,7 @@ pub fn trace(cpu: &mut CPU) -> String {
         cpu.register_x,
         cpu.register_y,
         cpu.status.0,
-        cpu.stack_pointer as u16 + 0x00FD,
+        cpu.stack_pointer,
     )
 }
 

@@ -49,6 +49,7 @@ fn main() {
     let mut cpu = CPU::new();
     cpu.load_rom(Rom::from_rom("./nestest.nes").unwrap());
     cpu.reset();
+    cpu.program_counter = 0xC000;
     cpu.run_with_callback(|cpu| {
         println!("{}", trace(cpu));
     });
