@@ -89,12 +89,12 @@ mod logical_tests {
         cpu.mem_write(0x8000, 0b0110_0110);
         cpu.and(&AddressingMode::Immediate);
         assert_eq!(cpu.register_a, 0b0110_0000);
-        assert_eq!(cpu.status.0, 0);
+        assert_eq!(cpu.status.0, 0b0010_0100);
         // Do another AND to make sure the status flag is set to 0
         cpu.mem_write(0x8000, 0);
         cpu.and(&AddressingMode::Immediate);
         assert_eq!(cpu.register_a, 0);
-        assert_eq!(cpu.status.0, 0b0000_0010);
+        assert_eq!(cpu.status.0, 0b0010_0110);
     }
 
     #[test]
@@ -106,7 +106,7 @@ mod logical_tests {
         cpu.mem_write(0x00AC, 0b1110_0110);
         cpu.and(&AddressingMode::ZeroPage);
         assert_eq!(cpu.register_a, 0b1110_0000);
-        assert_eq!(cpu.status.0, 0b1000_0000);
+        assert_eq!(cpu.status.0, 0b1010_0100);
     }
 
     #[test]
@@ -118,11 +118,11 @@ mod logical_tests {
         cpu.mem_write(0x00AB, 0b11011001);
         cpu.bit_test(&AddressingMode::ZeroPage);
         
-        assert_eq!(cpu.status.0, 0b1100_0000);
+        assert_eq!(cpu.status.0, 0b1110_0100);
     }
 
     #[test]
-    pub fn eclusive_or_test() {
+    pub fn exclusive_or_test() {
         let mut cpu = CPU::new();
         cpu.register_a = 0b1001_1001;
         cpu.program_counter = 0x8000;
@@ -130,7 +130,7 @@ mod logical_tests {
         cpu.mem_write(0xAB, 0b0000_1111);
         cpu.exclusive_or(&AddressingMode::ZeroPage);
         assert_eq!(cpu.register_a, 0b1001_0110);
-        assert_eq!(cpu.status.0, 0b1000_0000);
+        assert_eq!(cpu.status.0, 0b1010_0100);
     }
 
     #[test]
@@ -141,7 +141,7 @@ mod logical_tests {
         cpu.mem_write(0x8000, 0b1001_0001);
         cpu.inclusive_or(&AddressingMode::Immediate);
         assert_eq!(cpu.register_a, 0b1011_0011);
-        assert_eq!(cpu.status.0, 0b1000_0000);
+        assert_eq!(cpu.status.0, 0b1010_0100);
     }
 
     #[test]
@@ -152,7 +152,7 @@ mod logical_tests {
         cpu.mem_write(0x8000, 0x80);
         cpu.logical_shift_right(&AddressingMode::ZeroPage);
         assert_eq!(cpu.mem_read(0x80), 0b0010_1111);
-        assert_eq!(cpu.status.0, 0b0000_0001);
+        assert_eq!(cpu.status.0, 0b0010_0101);
     }
 
     #[test]
@@ -163,12 +163,12 @@ mod logical_tests {
         cpu.mem_write_u16(0x8000, 0x70);
         cpu.rotate_left(&AddressingMode::Absolute);
         assert_eq!(cpu.mem_read(0x70), 0b0001_1110);
-        assert_eq!(cpu.status.0, 0b0);
+        assert_eq!(cpu.status.0, 0b0010_0100);
 
         cpu.mem_write(0x70, 0b0);
         cpu.rotate_left(&AddressingMode::Absolute);
         assert_eq!(cpu.mem_read(0x70), 0);
-        assert_eq!(cpu.status.0, 0b0000_0010);
+        assert_eq!(cpu.status.0, 0b0010_0110);
     }
 
     #[test]
@@ -179,11 +179,11 @@ mod logical_tests {
         cpu.mem_write_u16(0x8000, 0x70);
         cpu.rotate_right(&AddressingMode::Absolute);
         assert_eq!(cpu.mem_read(0x70), 0b1000_0111);
-        assert_eq!(cpu.status.0, 0b1000_0001);
+        assert_eq!(cpu.status.0, 0b1010_0101);
 
         cpu.mem_write(0x70, 0b0);
         cpu.rotate_right(&AddressingMode::Absolute);
         assert_eq!(cpu.mem_read(0x70), 0);
-        assert_eq!(cpu.status.0, 0b0000_0010);
+        assert_eq!(cpu.status.0, 0b0010_0110);
     }
 }

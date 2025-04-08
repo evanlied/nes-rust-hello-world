@@ -67,7 +67,7 @@ mod load_tests {
         let test_program: Vec<u8> = vec!(0xa9, 0x00, 0x00);
         let mut cpu = CPU::new();
         cpu.load_and_run(test_program);
-        assert_eq!(cpu.status.0, 0b0000_0010);
+        assert_eq!(cpu.status.0, 0b0010_0110);
     }
 
     #[test]
@@ -75,7 +75,7 @@ mod load_tests {
         let test_program: Vec<u8> = vec!(0xa9, 0xc0, 0x00);
         let mut cpu = CPU::new();
         cpu.load_and_run(test_program);
-        assert_eq!(cpu.status.0, 0b1000_0000);
+        assert_eq!(cpu.status.0, 0b1010_0100);
     }
 
     #[test]
@@ -87,7 +87,7 @@ mod load_tests {
         cpu.mem_write(0xA2, 0xDC);
         cpu.load_register_x(&AddressingMode::ZeroPageY);
         assert_eq!(cpu.register_x, 0xDC);
-        assert_eq!(cpu.status.0, 0b1000_0000);
+        assert_eq!(cpu.status.0, 0b1010_0100);
     }
 
     #[test]
@@ -99,6 +99,6 @@ mod load_tests {
         cpu.mem_write(0x702, 0xC);
         cpu.load_register_y(&AddressingMode::AbsoluteX);
         assert_eq!(cpu.register_y, 0xC);
-        assert_eq!(cpu.status.0, 0);
+        assert_eq!(cpu.status.0, 0b0010_0100);
     }
 }

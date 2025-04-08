@@ -120,19 +120,19 @@ mod arithmetic_test {
         cpu.mem_write(0x8000, 10);
         cpu.add_with_carry(&AddressingMode::Immediate);
         assert_eq!(cpu.register_a, (250 as u8).wrapping_add(10));
-        assert_eq!(cpu.status.0, 0b0000_0001);
+        assert_eq!(cpu.status.0, 0b0010_0101);
 
         // Second addition now that carry bit is set will add an additional 1
         cpu.mem_write(0x8000, 22);
         cpu.add_with_carry(&AddressingMode::Immediate);
         assert_eq!(cpu.register_a, 27);
-        assert_eq!(cpu.status.0, 0b0);
+        assert_eq!(cpu.status.0, 0b0010_0100);
 
         // Third addition to check how zero result is handled
         cpu.mem_write(0x8000, 229);
         cpu.add_with_carry(&AddressingMode::Immediate);
         assert_eq!(cpu.register_a, 0);
-        assert_eq!(cpu.status.0, 0b000_0011);
+        assert_eq!(cpu.status.0, 0b0010_0111);
     }
 
     #[test]
@@ -143,14 +143,14 @@ mod arithmetic_test {
         cpu.mem_write(0x8000, 10);
         cpu.subtract_with_carry(&AddressingMode::Immediate);
         assert_eq!(cpu.register_a, 251);
-        assert_eq!(cpu.status.0, 0b1000_0000);
+        assert_eq!(cpu.status.0, 0b1010_0100);
 
         cpu.register_a = (125 as i8).wrapping_neg() as u8;
         println!("{:#8b}", cpu.register_a);
         cpu.mem_write(0x8000, 10);
         cpu.subtract_with_carry(&AddressingMode::Immediate);
         assert_eq!(cpu.register_a, 121);
-        assert_eq!(cpu.status.0, 0b0000_0001);
+        assert_eq!(cpu.status.0, 0b0010_0101);
     }
 
     #[test]
@@ -159,7 +159,7 @@ mod arithmetic_test {
         cpu.register_x = 0b01111111;
         cpu.increment_x();
         assert_eq!(cpu.register_x, 0b10000000);
-        assert_eq!(cpu.status.0, 0b10000000);
+        assert_eq!(cpu.status.0, 0b1010_0100);
     }
 
     #[test]
@@ -168,7 +168,7 @@ mod arithmetic_test {
         cpu.register_x = 155;
         cpu.decrement_x();
         assert_eq!(cpu.register_x, 154);
-        assert_eq!(cpu.status.0, 0b1000_0000);
+        assert_eq!(cpu.status.0, 0b1010_0100);
     }
 
     #[test]
@@ -177,7 +177,7 @@ mod arithmetic_test {
         cpu.register_y = 0xFF;
         cpu.increment_y();
         assert_eq!(cpu.register_y, 0);
-        assert_eq!(cpu.status.0, 0b0000_0010);
+        assert_eq!(cpu.status.0, 0b0010_0110);
     }
 
     #[test]
@@ -186,7 +186,7 @@ mod arithmetic_test {
         cpu.register_y = 55;
         cpu.decrement_y();
         assert_eq!(cpu.register_y, 54);
-        assert_eq!(cpu.status.0, 0b0000_0000);
+        assert_eq!(cpu.status.0, 0b0010_0100);
     }
 
     #[test]
@@ -197,7 +197,7 @@ mod arithmetic_test {
         cpu.mem_write(0xDC, 0xFF);
         cpu.increment_mem(&AddressingMode::ZeroPage);
         assert_eq!(cpu.mem_read(0xDC), 0x0);
-        assert_eq!(cpu.status.0, 0b0000_0010);
+        assert_eq!(cpu.status.0, 0b0010_0110);
     }
 
     #[test]
@@ -209,7 +209,7 @@ mod arithmetic_test {
         cpu.mem_write(0xAB, 0x1);
         cpu.decrement_mem(&AddressingMode::ZeroPageX);
         assert_eq!(cpu.mem_read(0xAB), 0);
-        assert_eq!(cpu.status.0, 0b0000_0010);
+        assert_eq!(cpu.status.0, 0b0010_0110);
     }
 
     #[test]
@@ -218,14 +218,14 @@ mod arithmetic_test {
         cpu.register_a = 0b11111001;
         cpu.arithmetic_shift_left(&AddressingMode::Accumulator);
         assert_eq!(cpu.register_a, 0b1111_0010);
-        assert_eq!(cpu.status.0, 0b1000_0001);
+        assert_eq!(cpu.status.0, 0b1010_0101);
 
         cpu.mem_write(0xAA, 0b1000_0000); // value to shift
         cpu.mem_write(0x8000, 0xAA); // zero page memory address
         cpu.program_counter = 0x8000;
         cpu.arithmetic_shift_left(&AddressingMode::ZeroPage);
         assert_eq!(cpu.mem_read(0xAA), 0b0000_0000);
-        assert_eq!(cpu.status.0, 0b0000_0011);
+        assert_eq!(cpu.status.0, 0b0010_0111);
     }
 
     #[test]
@@ -237,7 +237,7 @@ mod arithmetic_test {
         cpu.mem_write(0x00AB, 0x15);
         cpu.compare(&AddressingMode::ZeroPage);
 
-        assert_eq!(cpu.status.0, 0b1000_0001);
+        assert_eq!(cpu.status.0, 0b1010_0101);
     }
 
     #[test]
@@ -248,7 +248,7 @@ mod arithmetic_test {
         cpu.mem_write(0x8000, 0xA0);
         cpu.compare_x(&AddressingMode::Immediate);
         
-        assert_eq!(cpu.status.0, 0b0000_0000);
+        assert_eq!(cpu.status.0, 0b0010_0100);
     }
     
     #[test]
@@ -259,7 +259,7 @@ mod arithmetic_test {
         cpu.mem_write(0x8000, 0x10);
         cpu.compare_y(&AddressingMode::Immediate);
 
-        assert_eq!(cpu.status.0, 0b0000_0001);
+        assert_eq!(cpu.status.0, 0b0010_0101);
     }
 
 }
