@@ -61,16 +61,28 @@ impl CPU {
     }
 
     pub fn rotate_left(&mut self, mode: &AddressingMode) {
+        let is_carry_set = self.status.is_carry_set();
         let (old_val, new_val) = self
-            .perform_op_on_mem(mode, |old_val| old_val.rotate_left(1));
+            .perform_op_on_mem(mode, |old_val| {
+                match is_carry_set {
+                    true => old_val << 1 | 0b0000_0001,
+                    false => old_val << 1 & 0b1111_1110
+                }
+            });
 
         self.status.set_carry_flag(old_val & 0b1000_0000 != 0);
         self.status.set_negative_and_zero_flag(new_val);
     }
 
     pub fn rotate_right(&mut self, mode: &AddressingMode) {
+        let is_carry_set = self.status.is_carry_set();
         let (old_val, new_val) = self
-            .perform_op_on_mem(mode, |old_val| old_val.rotate_right(1));
+            .perform_op_on_mem(mode, |old_val| {
+                match is_carry_set {
+                    true => old_val >> 1 | 0b1000_0000,
+                    false => old_val >> 1 & 0b0111_1111
+                }
+            });
 
         self.status.set_carry_flag(old_val & 0b0000_0001 != 0);
         self.status.set_negative_and_zero_flag(new_val);
@@ -175,6 +187,7 @@ mod logical_tests {
     pub fn rotate_right() {
         let mut cpu = CPU::new();
         cpu.program_counter = 0x8000;
+        cpu.status.set_carry_flag(true);
         cpu.mem_write(0x70, 0b0000_1111);
         cpu.mem_write_u16(0x8000, 0x70);
         cpu.rotate_right(&AddressingMode::Absolute);
@@ -182,6 +195,7 @@ mod logical_tests {
         assert_eq!(cpu.status.0, 0b1010_0101);
 
         cpu.mem_write(0x70, 0b0);
+        cpu.status.set_carry_flag(false);
         cpu.rotate_right(&AddressingMode::Absolute);
         assert_eq!(cpu.mem_read(0x70), 0);
         assert_eq!(cpu.status.0, 0b0010_0110);

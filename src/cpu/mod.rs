@@ -533,7 +533,7 @@ mod cpu_tests {
         let mut cpu = CPU::new();
         cpu.load_and_run(vec!(0xA9, 0b11000011, 0x2A, 0x2A, 0x6A, 00));
         assert_eq!(cpu.program_counter, 0x8006);
-        assert_eq!(cpu.register_a, 0b1000_0111);
+        assert_eq!(cpu.register_a, 0b1000_0110);
         assert_eq!(cpu.status.0, 0b1010_0101);
     }
 
