@@ -48,11 +48,11 @@ impl CPU {
                 u16::from_le_bytes([lo, hi])
             },
             AddressingMode::IndirectY => {
-                let base = self.mem_read(self.program_counter) as u8;
-                let ptr = base.wrapping_add(self.register_y);
-                let lo = self.mem_read(ptr as u16);
-                let hi = self.mem_read(ptr.wrapping_add(1) as u16);
-                u16::from_le_bytes([lo, hi])
+                let arg = self.mem_read(self.program_counter);
+                let lo = self.mem_read(arg as u16);
+                let hi = self.mem_read(arg.wrapping_add(1) as u16);
+                let ptr_addr = u16::from_le_bytes([lo, hi]);
+                ptr_addr.wrapping_add(self.register_y as u16)
             },
             _ => panic!("Can't get addr for addressing mode {:?}", mode),
         }
@@ -166,11 +166,10 @@ mod test_addressing_modes {
         cpu.program_counter = 0x800;
         cpu.mem_write(0x800, 0x05);
         cpu.mem_write(0x801, 0x0A);
-        cpu.mem_write(0xA, 0x12);
-        cpu.mem_write(0xB, 0xC);
+        cpu.mem_write_u16(0x5, 0x6900);
         cpu.register_x = 0x06;
         cpu.register_y = 0x05;
-        assert_eq!(cpu.get_operand_address(&AddressingMode::IndirectY), 0x0C12);
+        assert_eq!(cpu.get_operand_address(&AddressingMode::IndirectY), 0x6905);
     }
 
     #[test]
