@@ -16,7 +16,7 @@ impl CPU {
         let param = self.mem_read(addr);
         let carry: u16 = if self.status.is_carry_set() { 1 } else { 0 };
         let result: u16 = (self.register_a as u16).wrapping_add(param as u16).wrapping_add(carry);
-        let normalized_result = (result % 256) as u8;
+        let normalized_result = result as u8;
 
         self.status.set_carry_flag(result > 255);
         self.status.set_overflow_flag(is_sign_incorrect(normalized_result, self.register_a, param));
@@ -26,11 +26,11 @@ impl CPU {
 
     pub fn subtract_with_carry(&mut self, mode: &AddressingMode) {
         let addr = self.get_operand_address(mode);
-        let param = self.mem_read(addr);
+        let param = self.mem_read(addr).wrapping_neg().wrapping_sub(1) as u8;
         let carry = if self.status.is_carry_set() { 1 } else { 0 };
         let result: u16 = (self.register_a.wrapping_add(carry) as u16) 
-            + ((param as i8).wrapping_neg().wrapping_sub(1) as u8) as u16;
-        let normalized_result = (result % 256) as u8;
+            .wrapping_add(param as u16);
+        let normalized_result = result as u8;
 
         self.status.set_carry_flag(result > 255);
         self.status.set_overflow_flag(is_sign_incorrect(normalized_result, self.register_a, param));
@@ -154,13 +154,13 @@ mod arithmetic_test {
         cpu.mem_write(0x8000, 10);
         cpu.subtract_with_carry(&AddressingMode::Immediate);
         assert_eq!(cpu.register_a, 250);
-        assert_eq!(cpu.status.0, 0b1110_0100);
+        assert_eq!(cpu.status.0, 0b1010_0100);
 
         cpu.register_a = (125 as i8).wrapping_neg() as u8;
         cpu.mem_write(0x8000, 10);
         cpu.subtract_with_carry(&AddressingMode::Immediate);
         assert_eq!(cpu.register_a, 120);
-        assert_eq!(cpu.status.0, 0b0010_0101);
+        assert_eq!(cpu.status.0, 0b0110_0101);
     }
 
     #[test]
