@@ -29,14 +29,15 @@ impl CPU {
             AddressingMode::AbsoluteX => self.mem_read_u16(self.program_counter).wrapping_add(self.register_x as u16),
             AddressingMode::AbsoluteY => self.mem_read_u16(self.program_counter).wrapping_add(self.register_y as u16),
             AddressingMode::Indirect => {
-                let ptr_addr = self.mem_read(self.program_counter);
-                let ptr = self.mem_read_u16(ptr_addr as u16);
+                let ptr = self.mem_read_u16(self.program_counter);
                 match self.indirect_bug_enabled && (ptr & 0xFF == 0xFF ) {
                     true => {
                         let bugged_ptr = ptr & 0xFF00;
-                        bugged_ptr
+                        let lo = self.mem_read(ptr);
+                        let hi = self.mem_read(bugged_ptr);
+                        u16::from_le_bytes([lo, hi])
                     },
-                    false => ptr
+                    false => self.mem_read_u16(ptr)
                 }
             },
             AddressingMode::IndirectX => {

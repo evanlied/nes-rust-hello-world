@@ -24,7 +24,7 @@ pub static OP_CODE_REF_TABLE: phf::Map<u8, OpCode> = phf_map! {
     0x6Du8 => OpCode::new("ADC", 3, 4, AddressingMode::Absolute),
     0x7Du8 => OpCode::new("ADC", 3, 4, AddressingMode::AbsoluteX),
     0x79u8 => OpCode::new("ADC", 3, 4, AddressingMode::AbsoluteY),
-    0x61u8 => OpCode::new("ADC", 2, 6, AddressingMode::Indirect),
+    0x61u8 => OpCode::new("ADC", 2, 6, AddressingMode::IndirectX),
     0x71u8 => OpCode::new("ADC", 2, 5, AddressingMode::IndirectY),
 
     // AND
