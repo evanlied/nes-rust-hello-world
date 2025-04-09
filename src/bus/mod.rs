@@ -53,7 +53,7 @@ impl MemAccess for Bus {
                 self.cpu_vram[mapped_addr as usize]
             },
             PPU_START..=PPU_END => {
-                todo!("PPU not supported yet")
+                todo!("Tried to access {} but PPU not supported yet", addr)
             },
             ROM_START..=ROM_END => self.read_prg_rom(addr),
             _ => {
