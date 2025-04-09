@@ -50,6 +50,7 @@ fn main() {
     cpu.load_rom(Rom::from_rom("./nestest.nes").unwrap());
     cpu.reset();
     cpu.program_counter = 0xC000;
+    cpu.indirect_bug_enabled = true;
     cpu.run_with_callback(|cpu| {
         println!("{}", trace(cpu));
     });

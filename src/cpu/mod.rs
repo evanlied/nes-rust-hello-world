@@ -25,7 +25,7 @@ pub struct CPU {
 
     // The JMP Indirect instruction has a bug where fetches on addrress 0xXXFF would return the MSB from
     // 0xXX00 instead of (0xXXFF + 1) (ie XX + 1). For example AAFF would have MSB at AA00 instead of AB00.
-    indirect_bug_enabled: bool,
+    pub indirect_bug_enabled: bool,
 }
 
 impl MemAccess for CPU {
