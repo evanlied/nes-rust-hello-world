@@ -34,11 +34,9 @@ impl CPU {
                 match self.indirect_bug_enabled && (ptr & 0xFF == 0xFF ) {
                     true => {
                         let bugged_ptr = ptr & 0xFF00;
-                        let lo = self.mem_read(ptr);
-                        let hi = self.mem_read(bugged_ptr);
-                        u16::from_le_bytes([lo, hi])
+                        bugged_ptr
                     },
-                    false => self.mem_read_u16(ptr)
+                    false => ptr
                 }
             },
             AddressingMode::IndirectX => {
