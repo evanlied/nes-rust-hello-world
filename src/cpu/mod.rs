@@ -514,7 +514,7 @@ mod cpu_tests {
         let mut cpu = CPU::new();
         cpu.load_and_run(vec!(0xA9, 0xF0, 0x48, 0x69, 0x5, 0x68, 0x00));
         assert_eq!(cpu.program_counter, 0x8007);
-        assert_eq!(cpu.mem_read(0xFD), 0xF0);
+        assert_eq!(cpu.mem_read(0x1FD), 0xF0);
         assert_eq!(cpu.register_a, 0xF0);
         assert_eq!(cpu.stack_pointer, 0xFD);
     }
@@ -525,7 +525,7 @@ mod cpu_tests {
         cpu.load_and_run(vec!(0xA9, 0xFF, 0x08, 0x69, 0x10, 0x28, 0x0));
         assert_eq!(cpu.program_counter, 0x8007);
         assert_eq!(cpu.status.0, 0b1010_0100);
-        assert_eq!(cpu.mem_read(0xFD), 0b1010_0100);
+        assert_eq!(cpu.mem_read(0x1FD), 0b1010_0100);
     }
 
     #[test]

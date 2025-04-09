@@ -1,10 +1,13 @@
 use super::CPU;
 use crate::MemAccess;
 
+const MIN_STACK: u16 = 0x0100;
+
 // Methods that deal with manipulating the stack memory located at 0x0100-0x01FF
 impl CPU {
     pub fn push_stack(&mut self, new_val: u8) {
-        self.mem_write(self.stack_pointer as u16, new_val);
+        let stack_addr = MIN_STACK + self.stack_pointer as u16;
+        self.mem_write(stack_addr, new_val);
         self.stack_pointer = self.stack_pointer.wrapping_sub(1);
     }
 
@@ -17,7 +20,8 @@ impl CPU {
 
     pub fn pop_stack(&mut self) -> u8 {
         self.stack_pointer = self.stack_pointer.wrapping_add(1);
-        let val = self.mem_read(self.stack_pointer as u16);
+        let stack_addr = MIN_STACK + self.stack_pointer as u16;
+        let val = self.mem_read(stack_addr);
         return val;
     }
 
@@ -57,7 +61,7 @@ mod stack_controller_test {
         let mut cpu = CPU::new();
         cpu.stack_pointer = 0x0;
         cpu.push_stack(0xAB);
-        assert_eq!(cpu.mem_read(0x0), 0xAB);
+        assert_eq!(cpu.mem_read(0x100), 0xAB);
         assert_eq!(cpu.stack_pointer, 0xFF);
 
         assert_eq!(cpu.pop_stack(), 0xAB);
@@ -70,8 +74,8 @@ mod stack_controller_test {
         cpu.stack_pointer = 0x0;
         cpu.push_stack_u16(0xABCD);
         assert_eq!(cpu.stack_pointer, 0xFE);
-        assert_eq!(cpu.mem_read(0xFF), 0xCD);
-        assert_eq!(cpu.mem_read(0x0), 0xAB);
+        assert_eq!(cpu.mem_read(0x1FF), 0xCD);
+        assert_eq!(cpu.mem_read(0x100), 0xAB);
 
         assert_eq!(cpu.pop_stack_u16(), 0xABCD);
         assert_eq!(cpu.stack_pointer, 0x0);
