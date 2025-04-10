@@ -275,15 +275,15 @@ pub static OP_CODE_REF_TABLE: phf::Map<u8, OpCode> = phf_map! {
     0x7Cu8 => OpCode::new("IGN", 3, 4, AddressingMode::AbsoluteX),
     0xDCu8 => OpCode::new("IGN", 3, 4, AddressingMode::AbsoluteX),
     0xFCu8 => OpCode::new("IGN", 3, 4, AddressingMode::AbsoluteX),
-    0x04u8 => OpCode::new("IGN", 2, 3, AddressingMode::IndirectY),
-    0x44u8 => OpCode::new("IGN", 2, 3, AddressingMode::IndirectY),
-    0x64u8 => OpCode::new("IGN", 2, 3, AddressingMode::IndirectY),
-    0x14u8 => OpCode::new("IGN", 2, 4, AddressingMode::IndirectX),
-    0x34u8 => OpCode::new("IGN", 2, 4, AddressingMode::IndirectX),
-    0x54u8 => OpCode::new("IGN", 2, 4, AddressingMode::IndirectX),
-    0x74u8 => OpCode::new("IGN", 2, 4, AddressingMode::IndirectX),
-    0xD4u8 => OpCode::new("IGN", 2, 4, AddressingMode::IndirectX),
-    0xF4u8 => OpCode::new("IGN", 2, 4, AddressingMode::IndirectX),
+    0x04u8 => OpCode::new("IGN", 2, 3, AddressingMode::ZeroPage),
+    0x44u8 => OpCode::new("IGN", 2, 3, AddressingMode::ZeroPage),
+    0x64u8 => OpCode::new("IGN", 2, 3, AddressingMode::ZeroPage),
+    0x14u8 => OpCode::new("IGN", 2, 4, AddressingMode::ZeroPageX),
+    0x34u8 => OpCode::new("IGN", 2, 4, AddressingMode::ZeroPageX),
+    0x54u8 => OpCode::new("IGN", 2, 4, AddressingMode::ZeroPageX),
+    0x74u8 => OpCode::new("IGN", 2, 4, AddressingMode::ZeroPageX),
+    0xD4u8 => OpCode::new("IGN", 2, 4, AddressingMode::ZeroPageX),
+    0xF4u8 => OpCode::new("IGN", 2, 4, AddressingMode::ZeroPageX),
 
     // SKB
     0x80u8 => OpCode::new("SKB", 2, 2, AddressingMode::Immediate),
@@ -291,4 +291,12 @@ pub static OP_CODE_REF_TABLE: phf::Map<u8, OpCode> = phf_map! {
     0x89u8 => OpCode::new("SKB", 2, 2, AddressingMode::Immediate),
     0xC2u8 => OpCode::new("SKB", 2, 2, AddressingMode::Immediate),
     0xE2u8 => OpCode::new("SKB", 2, 2, AddressingMode::Immediate),
+
+    // LAX Loads addressed value into A then transfer into X
+    0xA3u8 => OpCode::new("LAX", 2, 6, AddressingMode::IndirectX),
+    0xA7u8 => OpCode::new("LAX", 2, 3, AddressingMode::ZeroPage),
+    0xAFu8 => OpCode::new("LAX", 3, 4, AddressingMode::Absolute),
+    0xB3u8 => OpCode::new("LAX", 2, 6, AddressingMode::IndirectY),
+    0xB7u8 => OpCode::new("LAX", 2, 4, AddressingMode::ZeroPageY),
+    0xBFu8 => OpCode::new("LAX", 3, 4, AddressingMode::AbsoluteY),
 };

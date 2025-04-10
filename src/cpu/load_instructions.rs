@@ -1,9 +1,10 @@
+use std::ops::Add;
+
 use super::CPU;
 use super::addressing_modes::AddressingMode;
 use super::MemAccess;
 
 impl CPU {
-    // LDA
     pub fn load_register_a(&mut self, mode: &AddressingMode) {
         let addr = self.get_operand_address(&mode);
         let param = self.mem_read(addr);
@@ -56,6 +57,16 @@ impl CPU {
     pub fn transfer_x_to_stack_pointer(&mut self) {
         self.stack_pointer = self.register_x;
     }
+
+    // Unofficial instructions
+    pub fn load_a_and_x(&mut self, mode: &AddressingMode) {
+        let addr = self.get_operand_address(mode);
+        let val = self.mem_read(addr);
+        
+        self.register_a = val;
+        self.register_x = val;
+        self.status.set_negative_and_zero_flag(val);
+    }
 }
 
 #[cfg(test)]
@@ -99,6 +110,18 @@ mod load_tests {
         cpu.mem_write(0x702, 0xC);
         cpu.load_register_y(&AddressingMode::AbsoluteX);
         assert_eq!(cpu.register_y, 0xC);
+        assert_eq!(cpu.status.0, 0b0010_0100);
+    }
+
+    #[test]
+    pub fn lax_test() {
+        let mut cpu = CPU::new();
+        cpu.program_counter = 0x8000;
+        cpu.mem_write(0x8000, 0xAB);
+        cpu.mem_write(0x00AB, 0x69);
+        cpu.load_a_and_x(&AddressingMode::ZeroPage);
+        assert_eq!(cpu.register_x, 0x69);
+        assert_eq!(cpu.register_a, 0x69);
         assert_eq!(cpu.status.0, 0b0010_0100);
     }
 }
