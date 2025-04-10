@@ -255,4 +255,39 @@ pub static OP_CODE_REF_TABLE: phf::Map<u8, OpCode> = phf_map! {
 
     // BRK
     0x00u8 => OpCode::new("BRK", 1, 7, AddressingMode::Implied),
+
+    // Unofficial instructions
+    // https://www.nesdev.org/wiki/Programming_with_unofficial_opcodes
+
+    // NOP
+    0x1Au8 => OpCode::new("NOP", 1, 2, AddressingMode::Implied),
+    0x3Au8 => OpCode::new("NOP", 1, 2, AddressingMode::Implied),
+    0x5Au8 => OpCode::new("NOP", 1, 2, AddressingMode::Implied),
+    0x7Au8 => OpCode::new("NOP", 1, 2, AddressingMode::Implied),
+    0xDAu8 => OpCode::new("NOP", 1, 2, AddressingMode::Implied),
+    0xFAu8 => OpCode::new("NOP", 1, 2, AddressingMode::Implied),
+
+    // IGN
+    0x0Cu8 => OpCode::new("IGN", 3, 4, AddressingMode::Absolute),
+    0x1Cu8 => OpCode::new("IGN", 3, 4, AddressingMode::AbsoluteX),
+    0x3Cu8 => OpCode::new("IGN", 3, 4, AddressingMode::AbsoluteX),
+    0x5Cu8 => OpCode::new("IGN", 3, 4, AddressingMode::AbsoluteX),
+    0x7Cu8 => OpCode::new("IGN", 3, 4, AddressingMode::AbsoluteX),
+    0xDCu8 => OpCode::new("IGN", 3, 4, AddressingMode::AbsoluteX),
+    0xFCu8 => OpCode::new("IGN", 3, 4, AddressingMode::AbsoluteX),
+    0x04u8 => OpCode::new("IGN", 2, 3, AddressingMode::IndirectY),
+    0x44u8 => OpCode::new("IGN", 2, 3, AddressingMode::IndirectY),
+    0x14u8 => OpCode::new("IGN", 2, 4, AddressingMode::IndirectX),
+    0x34u8 => OpCode::new("IGN", 2, 4, AddressingMode::IndirectX),
+    0x54u8 => OpCode::new("IGN", 2, 4, AddressingMode::IndirectX),
+    0x74u8 => OpCode::new("IGN", 2, 4, AddressingMode::IndirectX),
+    0xD4u8 => OpCode::new("IGN", 2, 4, AddressingMode::IndirectX),
+    0xF4u8 => OpCode::new("IGN", 2, 4, AddressingMode::IndirectX),
+
+    // SKB
+    0x80u8 => OpCode::new("SKB", 2, 2, AddressingMode::Immediate),
+    0x82u8 => OpCode::new("SKB", 2, 2, AddressingMode::Immediate),
+    0x89u8 => OpCode::new("SKB", 2, 2, AddressingMode::Immediate),
+    0xC2u8 => OpCode::new("SKB", 2, 2, AddressingMode::Immediate),
+    0xE2u8 => OpCode::new("SKB", 2, 2, AddressingMode::Immediate),
 };
