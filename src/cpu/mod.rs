@@ -162,6 +162,7 @@ impl CPU {
                 "SEI" => self.set_interrupt_flag(),
                 "SKB" => { self.mem_read(self.get_operand_address(&op_code_params.addressing_mode)); },
                 "SLO" => self.shift_left_or_a(&op_code_params.addressing_mode),
+                "SRE" => self.shift_right_eor_a(&op_code_params.addressing_mode),
                 "STA" => self.store_register_a(&op_code_params.addressing_mode),
                 "STX" => self.store_register_x(&op_code_params.addressing_mode),
                 "STY" => self.store_register_y(&op_code_params.addressing_mode),
