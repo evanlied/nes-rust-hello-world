@@ -16,10 +16,10 @@ impl CPU {
 
     pub fn increment_subtract_carry(&mut self, mode: &AddressingMode) {
         let addr = self.get_operand_address(mode);
-        let param = self.mem_read(addr);
-        self.mem_write(addr, param.wrapping_add(1));
+        let param = self.mem_read(addr).wrapping_add(1);
+        self.mem_write(addr, param);
 
-        let neg_param = param.wrapping_neg();
+        let neg_param = param.wrapping_neg().wrapping_sub(1);
         let carry = if self.status.is_carry_set() { 1 } else { 0 };
         let result: u16 = (self.register_a.wrapping_add(carry) as u16) 
             .wrapping_add(neg_param as u16);
@@ -55,7 +55,7 @@ mod rmw_tests {
         cpu.mem_write(0x8000, 0xAB);
         cpu.mem_write(0xAB, 0xB);
         cpu.increment_subtract_carry(&AddressingMode::ZeroPage);
-        assert_eq!(cpu.register_a, 0xF4);
+        assert_eq!(cpu.register_a, 0xF2);
         assert_eq!(cpu.mem_read(0xAB), 0xC);
         assert_eq!(cpu.status.0, 0b1010_0101);
     }
