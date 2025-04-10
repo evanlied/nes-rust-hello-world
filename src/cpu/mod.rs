@@ -151,6 +151,7 @@ impl CPU {
                     self.return_from_interrupt();
                     continue;
                 },
+                "SAX" => self.store_a_anded_x(&op_code_params.addressing_mode),
                 "SBC" => self.subtract_with_carry(&op_code_params.addressing_mode),
                 "SEC" => self.set_carry_flag(),
                 "SED" => self.set_decimal_flag(),

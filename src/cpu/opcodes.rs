@@ -299,4 +299,10 @@ pub static OP_CODE_REF_TABLE: phf::Map<u8, OpCode> = phf_map! {
     0xB3u8 => OpCode::new("LAX", 2, 6, AddressingMode::IndirectY),
     0xB7u8 => OpCode::new("LAX", 2, 4, AddressingMode::ZeroPageY),
     0xBFu8 => OpCode::new("LAX", 3, 4, AddressingMode::AbsoluteY),
+
+    // SAX Stores to memory the result of A & X
+    0x83u8 => OpCode::new("SAX", 2, 6, AddressingMode::IndirectX),
+    0x87u8 => OpCode::new("SAX", 2, 3, AddressingMode::ZeroPage),
+    0x8Fu8 => OpCode::new("SAX", 3, 4, AddressingMode::Absolute),
+    0x97u8 => OpCode::new("SAX", 2, 4, AddressingMode::ZeroPageY),
 };
