@@ -277,6 +277,7 @@ pub static OP_CODE_REF_TABLE: phf::Map<u8, OpCode> = phf_map! {
     0xFCu8 => OpCode::new("IGN", 3, 4, AddressingMode::AbsoluteX),
     0x04u8 => OpCode::new("IGN", 2, 3, AddressingMode::IndirectY),
     0x44u8 => OpCode::new("IGN", 2, 3, AddressingMode::IndirectY),
+    0x64u8 => OpCode::new("IGN", 2, 3, AddressingMode::IndirectY),
     0x14u8 => OpCode::new("IGN", 2, 4, AddressingMode::IndirectX),
     0x34u8 => OpCode::new("IGN", 2, 4, AddressingMode::IndirectX),
     0x54u8 => OpCode::new("IGN", 2, 4, AddressingMode::IndirectX),
