@@ -30,7 +30,7 @@ impl CPU {
         self.register_a = normalized_result;
     }
 
-    pub fn shift_left_or_a(&mut self, mode:&AddressingMode) {
+    pub fn shift_left_or_a(&mut self, mode: &AddressingMode) {
         let addr = self.get_operand_address(mode);
         let val = self.mem_read(addr);
         let shifted = val << 1;
@@ -40,6 +40,21 @@ impl CPU {
         self.register_a = ored;
         self.status.set_carry_flag(val & 0b1000_0000 != 0);
         self.status.set_negative_and_zero_flag(ored);
+    }
+
+    pub fn rotate_left_and_a(&mut self, mode: &AddressingMode) {
+        let addr = self.get_operand_address(mode);
+        let val = self.mem_read(addr);
+        let shifted = match self.status.is_carry_set() {
+            true => val << 1 | 0b0000_0001,
+            false => val << 1 & 0b1111_1110,
+        };
+        let anded = self.register_a & shifted;
+
+        self.mem_write(addr, shifted);
+        self.register_a = anded;
+        self.status.set_carry_flag(val & 0b1000_0000 != 0);
+        self.status.set_negative_and_zero_flag(anded);
     }
 }
 
@@ -81,6 +96,19 @@ mod rmw_tests {
         cpu.mem_write(0xAB, 0xF);
         cpu.shift_left_or_a(&AddressingMode::ZeroPage);
         assert_eq!(cpu.register_a, 0b0001_1111);
+        assert_eq!(cpu.mem_read(0xAB), 0b0001_1110);
+        assert_eq!(cpu.status.0, 0b0010_0100);
+    }
+
+    #[test]
+    pub fn rla_test() {
+        let mut cpu = CPU::new();
+        cpu.register_a = 0xF;
+        cpu.program_counter = 0x8000;
+        cpu.mem_write(0x8000, 0xAB);
+        cpu.mem_write(0xAB, 0xF);
+        cpu.rotate_left_and_a(&AddressingMode::ZeroPage);
+        assert_eq!(cpu.register_a, 0b0000_1110);
         assert_eq!(cpu.mem_read(0xAB), 0b0001_1110);
         assert_eq!(cpu.status.0, 0b0010_0100);
     }

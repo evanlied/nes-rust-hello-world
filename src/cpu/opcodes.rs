@@ -335,4 +335,13 @@ pub static OP_CODE_REF_TABLE: phf::Map<u8, OpCode> = phf_map! {
     0x17u8 => OpCode::new("SLO", 2, 6, AddressingMode::ZeroPageX),
     0x1Bu8 => OpCode::new("SLO", 3, 7, AddressingMode::AbsoluteY),
     0x1Fu8 => OpCode::new("SLO", 3, 7, AddressingMode::AbsoluteX),
+
+    // RLA Rotate left memory, AND with A
+    0x23u8 => OpCode::new("RLA", 2, 8, AddressingMode::IndirectX),
+    0x27u8 => OpCode::new("RLA", 2, 5, AddressingMode::ZeroPage),
+    0x2Fu8 => OpCode::new("RLA", 3, 6, AddressingMode::Absolute),
+    0x33u8 => OpCode::new("RLA", 2, 8, AddressingMode::IndirectY),
+    0x37u8 => OpCode::new("RLA", 2, 6, AddressingMode::ZeroPageX),
+    0x3Bu8 => OpCode::new("RLA", 3, 7, AddressingMode::AbsoluteY),
+    0x3Fu8 => OpCode::new("RLA", 3, 7, AddressingMode::AbsoluteX),
 };

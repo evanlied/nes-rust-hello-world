@@ -148,6 +148,7 @@ impl CPU {
                 "PHP" => self.push_processor_status(),
                 "PLA" => self.pull_accumulator(),
                 "PLP" => self.pull_processor_status(),
+                "RLA" => self.rotate_left_and_a(&op_code_params.addressing_mode),
                 "ROL" => self.rotate_left(&op_code_params.addressing_mode),
                 "ROR" => self.rotate_right(&op_code_params.addressing_mode),
                 "RTI" => {
