@@ -128,6 +128,7 @@ impl CPU {
                 "INC" => self.increment_mem(&op_code_params.addressing_mode),
                 "INX" => self.increment_x(),
                 "INY" => self.increment_y(),
+                "ISC" => self.increment_subtract_carry(&op_code_params.addressing_mode),
                 "JMP" => {
                     self.jump(&op_code_params.addressing_mode);
                     continue;

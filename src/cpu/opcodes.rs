@@ -317,4 +317,13 @@ pub static OP_CODE_REF_TABLE: phf::Map<u8, OpCode> = phf_map! {
     0xD7u8 => OpCode::new("DCP", 2, 6, AddressingMode::ZeroPageX),
     0xDBu8 => OpCode::new("DCP", 3, 7, AddressingMode::AbsoluteY),
     0xDFu8 => OpCode::new("DCP", 3, 7, AddressingMode::AbsoluteX),
+
+    // ISC
+    0xE3u8 => OpCode::new("ISC", 2, 8, AddressingMode::IndirectX),
+    0xE7u8 => OpCode::new("ISC", 2, 5, AddressingMode::ZeroPage),
+    0xEFu8 => OpCode::new("ISC", 3, 6, AddressingMode::Absolute),
+    0xF3u8 => OpCode::new("ISC", 2, 8, AddressingMode::IndirectY),
+    0xF7u8 => OpCode::new("ISC", 2, 6, AddressingMode::ZeroPageX),
+    0xFBu8 => OpCode::new("ISC", 3, 7, AddressingMode::AbsoluteY),
+    0xFFu8 => OpCode::new("ISC", 3, 7, AddressingMode::AbsoluteX),
 };

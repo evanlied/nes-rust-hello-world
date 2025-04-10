@@ -2,7 +2,7 @@ use super::{addressing_modes::AddressingMode, CPU};
 use super::MemAccess;
 
 // To be used with add_with_carry and subtract_with_carry functions
-fn is_sign_incorrect(new_val: u8, old_val: u8, param: u8) -> u8 {
+pub fn is_sign_incorrect(new_val: u8, old_val: u8, param: u8) -> u8 {
     if ((param ^ new_val) & (new_val ^ old_val) & 0x80) != 0 {
         return 0b0100_0000 // signs are incorrect, set overflow bit
     } else {

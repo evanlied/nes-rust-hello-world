@@ -1,6 +1,7 @@
 // RMW stands for read-modify-write
 
 use super::{addressing_modes::AddressingMode, CPU, MemAccess};
+use super::arithmetic_instructions::is_sign_incorrect;
 
 impl CPU {
     pub fn decrement_compare_a(&mut self, mode: &AddressingMode) {
@@ -11,6 +12,22 @@ impl CPU {
 
         self.status.set_carry_flag(self.register_a >= result);
         self.status.set_negative_and_zero_flag(self.register_a.wrapping_sub(result));
+    }
+
+    pub fn increment_subtract_carry(&mut self, mode: &AddressingMode) {
+        let addr = self.get_operand_address(mode);
+        let param = self.mem_read(addr);
+        self.mem_write(addr, param.wrapping_add(1));
+
+        let neg_param = param.wrapping_neg();
+        let carry = if self.status.is_carry_set() { 1 } else { 0 };
+        let result: u16 = (self.register_a.wrapping_add(carry) as u16) 
+            .wrapping_add(neg_param as u16);
+        let normalized_result = result as u8;
+        self.status.set_carry_flag(result > 255);
+        self.status.set_overflow_flag(is_sign_incorrect(normalized_result, self.register_a, neg_param));
+        self.status.set_negative_and_zero_flag(normalized_result);
+        self.register_a = normalized_result;
     }
 }
 
@@ -28,5 +45,18 @@ mod rmw_tests {
         cpu.decrement_compare_a(&AddressingMode::ZeroPage);
         assert_eq!(cpu.mem_read(0xAB), 0x69);
         assert_eq!(cpu.status.0, 0b0010_0111);
+    }
+
+    #[test]
+    pub fn isc_test() {
+        let mut cpu = CPU::new();
+        cpu.register_a = 0xFF;
+        cpu.program_counter = 0x8000;
+        cpu.mem_write(0x8000, 0xAB);
+        cpu.mem_write(0xAB, 0xB);
+        cpu.increment_subtract_carry(&AddressingMode::ZeroPage);
+        assert_eq!(cpu.register_a, 0xF4);
+        assert_eq!(cpu.mem_read(0xAB), 0xC);
+        assert_eq!(cpu.status.0, 0b1010_0101);
     }
 }
