@@ -309,7 +309,7 @@ pub static OP_CODE_REF_TABLE: phf::Map<u8, OpCode> = phf_map! {
     // SBC Just a copy of SBC Immediate
     0xEBu8 => OpCode::new("SBC", 2, 2, AddressingMode::Immediate),
 
-    // DCP
+    // DCP Decrement memory, compare to accumulator
     0xC3u8 => OpCode::new("DCP", 2, 8, AddressingMode::IndirectX),
     0xC7u8 => OpCode::new("DCP", 2, 5, AddressingMode::ZeroPage),
     0xCFu8 => OpCode::new("DCP", 3, 6, AddressingMode::Absolute),
@@ -318,7 +318,7 @@ pub static OP_CODE_REF_TABLE: phf::Map<u8, OpCode> = phf_map! {
     0xDBu8 => OpCode::new("DCP", 3, 7, AddressingMode::AbsoluteY),
     0xDFu8 => OpCode::new("DCP", 3, 7, AddressingMode::AbsoluteX),
 
-    // ISC
+    // ISC Increment memory, subtract from accumulator
     0xE3u8 => OpCode::new("ISC", 2, 8, AddressingMode::IndirectX),
     0xE7u8 => OpCode::new("ISC", 2, 5, AddressingMode::ZeroPage),
     0xEFu8 => OpCode::new("ISC", 3, 6, AddressingMode::Absolute),
@@ -326,4 +326,13 @@ pub static OP_CODE_REF_TABLE: phf::Map<u8, OpCode> = phf_map! {
     0xF7u8 => OpCode::new("ISC", 2, 6, AddressingMode::ZeroPageX),
     0xFBu8 => OpCode::new("ISC", 3, 7, AddressingMode::AbsoluteY),
     0xFFu8 => OpCode::new("ISC", 3, 7, AddressingMode::AbsoluteX),
+
+    // SLO Shift left memory, OR with A
+    0x03u8 => OpCode::new("SLO", 2, 8, AddressingMode::IndirectX),
+    0x07u8 => OpCode::new("SLO", 2, 5, AddressingMode::ZeroPage),
+    0x0Fu8 => OpCode::new("SLO", 3, 6, AddressingMode::Absolute),
+    0x13u8 => OpCode::new("SLO", 2, 8, AddressingMode::IndirectY),
+    0x17u8 => OpCode::new("SLO", 2, 6, AddressingMode::ZeroPageX),
+    0x1Bu8 => OpCode::new("SLO", 3, 7, AddressingMode::AbsoluteY),
+    0x1Fu8 => OpCode::new("SLO", 3, 7, AddressingMode::AbsoluteX),
 };

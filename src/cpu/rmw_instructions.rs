@@ -29,6 +29,18 @@ impl CPU {
         self.status.set_negative_and_zero_flag(normalized_result);
         self.register_a = normalized_result;
     }
+
+    pub fn shift_left_or_a(&mut self, mode:&AddressingMode) {
+        let addr = self.get_operand_address(mode);
+        let val = self.mem_read(addr);
+        let shifted = val << 1;
+        let ored = self.register_a | shifted;
+
+        self.mem_write(addr, shifted);
+        self.register_a = ored;
+        self.status.set_carry_flag(val & 0b1000_0000 != 0);
+        self.status.set_negative_and_zero_flag(ored);
+    }
 }
 
 #[cfg(test)]
@@ -58,5 +70,18 @@ mod rmw_tests {
         assert_eq!(cpu.register_a, 0xF2);
         assert_eq!(cpu.mem_read(0xAB), 0xC);
         assert_eq!(cpu.status.0, 0b1010_0101);
+    }
+
+    #[test]
+    pub fn slo_test() {
+        let mut cpu = CPU::new();
+        cpu.register_a = 0x0F;
+        cpu.program_counter = 0x8000;
+        cpu.mem_write(0x8000, 0xAB);
+        cpu.mem_write(0xAB, 0xF);
+        cpu.shift_left_or_a(&AddressingMode::ZeroPage);
+        assert_eq!(cpu.register_a, 0b0001_1111);
+        assert_eq!(cpu.mem_read(0xAB), 0b0001_1110);
+        assert_eq!(cpu.status.0, 0b0010_0100);
     }
 }
