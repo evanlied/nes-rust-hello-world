@@ -21,7 +21,7 @@ impl CPU {
 
         let neg_param = param.wrapping_neg().wrapping_sub(1);
         let carry = if self.status.is_carry_set() { 1 } else { 0 };
-        let result: u16 = (self.register_a.wrapping_add(carry) as u16) 
+        let result: u16 = (self.register_a as u16).wrapping_add(carry) 
             .wrapping_add(neg_param as u16);
         let normalized_result = result as u8;
         self.status.set_carry_flag(result > 255);
