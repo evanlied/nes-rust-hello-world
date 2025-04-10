@@ -305,4 +305,7 @@ pub static OP_CODE_REF_TABLE: phf::Map<u8, OpCode> = phf_map! {
     0x87u8 => OpCode::new("SAX", 2, 3, AddressingMode::ZeroPage),
     0x8Fu8 => OpCode::new("SAX", 3, 4, AddressingMode::Absolute),
     0x97u8 => OpCode::new("SAX", 2, 4, AddressingMode::ZeroPageY),
+
+    // SBC Just a copy of SBC Immediate
+    0xEBu8 => OpCode::new("SBC", 2, 2, AddressingMode::Immediate),
 };
