@@ -232,7 +232,7 @@ pub static OP_CODE_REF_TABLE: phf::Map<u8, OpCode> = phf_map! {
 
     // STY
     0x84u8 => OpCode::new("STY", 2, 3, AddressingMode::ZeroPage),
-    0x94u8 => OpCode::new("STY", 2, 4, AddressingMode::ZeroPageY),
+    0x94u8 => OpCode::new("STY", 2, 4, AddressingMode::ZeroPageX),
     0x8Cu8 => OpCode::new("STY", 3, 4, AddressingMode::Absolute),
 
     // TAX
