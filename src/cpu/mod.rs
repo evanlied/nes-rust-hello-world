@@ -3,6 +3,7 @@ mod store_instructions;
 mod branching_instructions;
 mod arithmetic_instructions;
 mod logical_instructions;
+mod rmw_instructions;
 pub mod addressing_modes;
 mod stack;
 mod status_flags;
@@ -118,6 +119,7 @@ impl CPU {
                 "CMP" => self.compare(&op_code_params.addressing_mode),
                 "CPX" => self.compare_x(&op_code_params.addressing_mode),
                 "CPY" => self.compare_y(&op_code_params.addressing_mode),
+                "DCP" => self.decrement_compare_a(&op_code_params.addressing_mode),
                 "DEC" => self.decrement_mem(&op_code_params.addressing_mode),
                 "DEX" => self.decrement_x(),
                 "DEY" => self.decrement_y(),
