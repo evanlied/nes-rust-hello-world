@@ -151,6 +151,7 @@ impl CPU {
                 "RLA" => self.rotate_left_and_a(&op_code_params.addressing_mode),
                 "ROL" => self.rotate_left(&op_code_params.addressing_mode),
                 "ROR" => self.rotate_right(&op_code_params.addressing_mode),
+                "RRA" => self.rotate_right_add_a(&op_code_params.addressing_mode),
                 "RTI" => {
                     self.return_from_interrupt();
                     continue;

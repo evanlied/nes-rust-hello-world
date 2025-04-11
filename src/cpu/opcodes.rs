@@ -353,4 +353,13 @@ pub static OP_CODE_REF_TABLE: phf::Map<u8, OpCode> = phf_map! {
     0x57u8 => OpCode::new("SRE", 2, 6, AddressingMode::ZeroPageX),
     0x5Bu8 => OpCode::new("SRE", 3, 7, AddressingMode::AbsoluteY),
     0x5Fu8 => OpCode::new("SRE", 3, 7, AddressingMode::AbsoluteX),
+
+    // RRA Rotate right memory, add with carry with a
+    0x63u8 => OpCode::new("RRA", 2, 8, AddressingMode::IndirectX),
+    0x67u8 => OpCode::new("RRA", 2, 5, AddressingMode::ZeroPage),
+    0x6Fu8 => OpCode::new("RRA", 3, 6, AddressingMode::Absolute),
+    0x73u8 => OpCode::new("RRA", 2, 8, AddressingMode::IndirectY),
+    0x77u8 => OpCode::new("RRA", 2, 6, AddressingMode::ZeroPageX),
+    0x7Bu8 => OpCode::new("RRA", 3, 7, AddressingMode::AbsoluteY),
+    0x7Fu8 => OpCode::new("RRA", 3, 7, AddressingMode::AbsoluteX),
 };
