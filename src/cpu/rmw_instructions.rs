@@ -76,6 +76,7 @@ impl CPU {
             true => val >> 1 | 0b1000_0000,
             false => val >> 1 & 0b0111_1111,
         };
+        self.status.set_carry_flag(val & 0b0000_0001 != 0);
         let carry: u16 = if self.status.is_carry_set() { 1 } else { 0 };
         let added: u16 = (self.register_a as u16).wrapping_add(shifted as u16).wrapping_add(carry);
         let added_u8 = added as u8;
@@ -159,13 +160,14 @@ mod rmw_tests {
     #[test]
     pub fn rra_test() {
         let mut cpu = CPU::new();
-        cpu.register_a = 0xF;
+        cpu.register_a = 0xB2;
         cpu.program_counter = 0x8000;
+        cpu.status.0 = 0xE4;
         cpu.mem_write(0x8000, 0xAB);
-        cpu.mem_write(0xAB, 0xF);
+        cpu.mem_write(0xAB, 0xA5);
         cpu.rotate_right_add_a(&AddressingMode::ZeroPage);
-        assert_eq!(cpu.register_a, 0b0001_0110);
-        assert_eq!(cpu.mem_read(0xAB), 0b0000_0111);
-        assert_eq!(cpu.status.0, 0b0010_0100);
+        assert_eq!(cpu.register_a, 0x5);
+        assert_eq!(cpu.mem_read(0xAB), 82);
+        assert_eq!(cpu.status.0, 0b0010_0101);
     }
 }
