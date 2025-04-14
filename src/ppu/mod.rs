@@ -70,7 +70,7 @@ impl PPU {
         let normalized_addr = addr & 0x2FFF; // Mirros down 0x3000 - 0x3FFF addr to 0x2000 - 0x2FFF range
 
         match normalized_addr {
-            0x2000..0x2400 => addr - 0x2400,
+            0x2000..0x2400 => addr - 0x2000,
             0x2400..0x2800 => {
                 let offset = if self.mirroring == Mirroring::Horizontal { 0 } else { 0x400 };
                 addr - 0x2400 + offset
@@ -80,9 +80,42 @@ impl PPU {
                 addr - 0x2800 + offset
             },
             0x2C00..0x3000 => {
-                addr - 0x2C00 + 400
+                addr - 0x2C00 + 0x400
             },
             _ => panic!("{addr:04X} cannot be mirrored onto VRAM")
         }
+    }
+}
+
+#[cfg(test)]
+mod ppu_tests {
+    use super::*;
+
+    fn test_ppu() -> PPU {
+        PPU {
+            chr_rom: vec![0; 2048],
+            mirroring: Mirroring::Horizontal,
+            vram: [0; 2048],
+            oam_data: [0; 256],
+            palette_table: [0; 32],
+            addr_register: AddrRegister::new(),
+            control_register: ControlRegister::new(),
+            internal_data_buffer: 0,
+        }
+    }
+
+    #[test]
+    pub fn mirror_vram_addr_test() {
+        let mut ppu = test_ppu();
+        assert_eq!(ppu.mirror_vram_addr(0x2212), 0x212);
+        assert_eq!(ppu.mirror_vram_addr(0x2612), 0x212);
+        assert_eq!(ppu.mirror_vram_addr(0x2AAB), 0x6AB);
+        assert_eq!(ppu.mirror_vram_addr(0x2EAC), 0x6AC);
+
+        ppu.mirroring = Mirroring::Vertical;
+        assert_eq!(ppu.mirror_vram_addr(0x2212), 0x212);
+        assert_eq!(ppu.mirror_vram_addr(0x2612), 0x612);
+        assert_eq!(ppu.mirror_vram_addr(0x2BAB), 0x3AB);
+        assert_eq!(ppu.mirror_vram_addr(0x2EAC), 0x6AC);
     }
 }
