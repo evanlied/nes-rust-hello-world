@@ -14,6 +14,7 @@ pub struct PPU {
     pub mirroring: Mirroring,
     pub addr_register: AddrRegister,
     pub control_register: ControlRegister,
+    internal_data_buffer: u8,
 }
 
 impl PPU {
@@ -26,6 +27,7 @@ impl PPU {
             palette_table: [0; 32],
             addr_register: AddrRegister::new(),
             control_register: ControlRegister::new(),
+            internal_data_buffer: 0,
         }
     }
 
@@ -35,5 +37,52 @@ impl PPU {
 
     pub fn write_to_control_register(&mut self, value: u8) {
         self.control_register.update(value);
+    }
+
+    fn increment_vram_addr(&mut self) {
+        let increment_amount = self.control_register.get_vram_increment_size();
+        self.addr_register.increment(increment_amount);
+    }
+
+    pub fn read_data(&mut self) -> u8 {
+        let addr = self.addr_register.get();
+        self.increment_vram_addr();
+
+        match addr {
+            0..=0x1FFF => {
+                let result = self.internal_data_buffer;
+                self.internal_data_buffer = self.chr_rom[addr as usize];
+                result
+            },
+            0x2000..=0x2FFF => {
+                let result = self.internal_data_buffer;
+                let mirrored_addr = self.mirror_vram_addr(addr);
+                self.internal_data_buffer = self.vram[mirrored_addr as usize];
+                result
+            },
+            0x3000..=0x3EFF => panic!("0x3000 - 0x3eff addresses are not expected to be used, requested {addr:04X}"),
+            0x3F00..=0x3FFF => self.palette_table[(addr - 0x3F00) as usize],
+            _ => panic!("Unexpected read to a mirrored addressed {addr:04X}")
+        }
+    }
+
+    pub fn mirror_vram_addr(&self, addr: u16) -> u16 {
+        let normalized_addr = addr & 0x2FFF; // Mirros down 0x3000 - 0x3FFF addr to 0x2000 - 0x2FFF range
+
+        match normalized_addr {
+            0x2000..0x2400 => addr - 0x2400,
+            0x2400..0x2800 => {
+                let offset = if self.mirroring == Mirroring::Horizontal { 0 } else { 0x400 };
+                addr - 0x2400 + offset
+            },
+            0x2800..0x2C00 => {
+                let offset = if self.mirroring == Mirroring::Vertical { 0 } else { 0x400 };
+                addr - 0x2800 + offset
+            },
+            0x2C00..0x3000 => {
+                addr - 0x2C00 + 400
+            },
+            _ => panic!("{addr:04X} cannot be mirrored onto VRAM")
+        }
     }
 }

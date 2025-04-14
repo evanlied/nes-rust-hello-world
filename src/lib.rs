@@ -4,6 +4,7 @@ pub mod rom;
 pub mod ppu;
 pub mod format_test;
 
+#[derive(PartialEq)]
 pub enum Mirroring {
     Vertical,
     Horizontal,
