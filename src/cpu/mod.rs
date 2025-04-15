@@ -30,7 +30,7 @@ pub struct CPU {
 }
 
 impl MemAccess for CPU {
-    fn mem_read(&self, addr: u16) -> u8 {
+    fn mem_read(&mut self, addr: u16) -> u8 {
         self.bus.mem_read(addr)
     }
 
@@ -38,7 +38,7 @@ impl MemAccess for CPU {
         self.bus.mem_write(addr, data);
     }
 
-    fn mem_read_u16(&self, addr: u16) -> u16 {
+    fn mem_read_u16(&mut self, addr: u16) -> u16 {
         let lo = self.mem_read(addr);
         let hi = self.mem_read(addr.wrapping_add(1));
         u16::from_le_bytes([lo, hi])
@@ -124,7 +124,10 @@ impl CPU {
                 "DEX" => self.decrement_x(),
                 "DEY" => self.decrement_y(),
                 "EOR" => self.exclusive_or(&op_code_params.addressing_mode),
-                "IGN" => { self.mem_read(self.get_operand_address(&op_code_params.addressing_mode)); },
+                "IGN" => { 
+                    let op_addr = self.get_operand_address(&op_code_params.addressing_mode);
+                    self.mem_read(op_addr);
+                },
                 "INC" => self.increment_mem(&op_code_params.addressing_mode),
                 "INX" => self.increment_x(),
                 "INY" => self.increment_y(),
@@ -161,7 +164,10 @@ impl CPU {
                 "SEC" => self.set_carry_flag(),
                 "SED" => self.set_decimal_flag(),
                 "SEI" => self.set_interrupt_flag(),
-                "SKB" => { self.mem_read(self.get_operand_address(&op_code_params.addressing_mode)); },
+                "SKB" => {
+                    let op_addr = self.get_operand_address(&op_code_params.addressing_mode);
+                    self.mem_read(op_addr);
+                },
                 "SLO" => self.shift_left_or_a(&op_code_params.addressing_mode),
                 "SRE" => self.shift_right_eor_a(&op_code_params.addressing_mode),
                 "STA" => self.store_register_a(&op_code_params.addressing_mode),

@@ -18,10 +18,10 @@ pub struct PPU {
 }
 
 impl PPU {
-    pub fn from_rom(rom: Rom) -> Self {
+    pub fn from_rom(rom: &Rom) -> Self {
         PPU {
-            chr_rom: rom.chr_rom,
-            mirroring: rom.screen_mirroring,
+            chr_rom: rom.chr_rom.clone(),
+            mirroring: rom.screen_mirroring.clone(),
             vram: [0; 2048],
             oam_data: [0; 256],
             palette_table: [0; 32],
@@ -33,6 +33,12 @@ impl PPU {
 
     pub fn write_to_ppu_addr(&mut self, addr: u8) {
         self.addr_register.update(addr);
+    }
+
+    pub fn write_to_ppu_data(&mut self, data: u8) {
+        let mut addr = self.addr_register.get();
+        addr = self.mirror_vram_addr(addr);
+        self.vram[addr as usize] = data;
     }
 
     pub fn write_to_control_register(&mut self, value: u8) {

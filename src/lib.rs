@@ -4,7 +4,7 @@ pub mod rom;
 pub mod ppu;
 pub mod format_test;
 
-#[derive(PartialEq)]
+#[derive(PartialEq, Clone)]
 pub enum Mirroring {
     Vertical,
     Horizontal,
@@ -12,11 +12,11 @@ pub enum Mirroring {
 }
 
 pub trait MemAccess {
-    fn mem_read(&self, addr: u16) -> u8;
+    fn mem_read(&mut self, addr: u16) -> u8;
 
     fn mem_write(&mut self, addr: u16, data: u8);
 
-    fn mem_read_u16(&self, addr: u16) -> u16 {
+    fn mem_read_u16(&mut self, addr: u16) -> u16 {
         let lo = self.mem_read(addr);
         let hi = self.mem_read(addr.wrapping_add(1));
         u16::from_le_bytes([lo, hi])
